@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Acceso al sistema</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="contenedor">
+
+    <h1>Registro de Actividades</h1>
+    <h3>Iniciar sesión</h3>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% for categoria, mensaje in mensajes %}
+            <p class="{{ categoria }}">{{ mensaje }}</p>
+        {% endfor %}
+    {% endwith %}
+
+<form action="{{ url_for('auth.do_login') }}" method="POST">
+
+    <label>Usuario</label>
+    <input
+        type="text"
+        name="usuario"
+        required
+        autocomplete="username">
+
+    <label>Contraseña</label>
+    <input
+        type="password"
+        name="password"
+        required
+        autocomplete="current-password">
+
+    <button type="submit">
+        Ingresar
+    </button>
+
+</form>
+
+</div>
+
+</body>
+</html>

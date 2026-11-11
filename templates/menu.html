@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Menú Principal</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+
+        <div id="modalExito" class="modal">
+
+            <div class="modal-contenido">
+
+                <h2>Operación Exitosa</h2>
+
+                {% for category, message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+
+                    <button
+                        type="button"
+                        onclick="document.getElementById('modalExito').style.display='none'">
+                        Aceptar
+                    </button>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+{% endwith %}
+
+<ul>
+<li>
+
+<a href="/ticket/nuevo">
+Nuevo Ticket
+</a>
+</li>
+<li>
+<a href="/logout">
+Cerrar Sesión
+</a>
+</li>
+</ul>
+{% endblock %}
+

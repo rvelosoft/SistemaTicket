@@ -1,48 +1,33 @@
 from flask import Flask
-from config import Config
+from flask_login import LoginManager
 
-from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
-
-from models import db
-from flask_login import (
-    LoginManager
-)
-
-from models.user import User
 from auth.routes import auth_bp
+from config import Config
+from models import db
+from models.user import User
 from routes.home import home_bp
 from routes.tickets import ticket_bp
 
 app = Flask(__name__)
-app.config.from_object(
-    Config
-)
+app.config.from_object(Config)
 db.init_app(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
 @login_manager.user_loader
 def load_user(user_id):
+    return db.session.get(User, int(user_id))
 
-    return User.query.get(
-        int(user_id)
-    )
 
-app.register_blueprint(
-    auth_bp
-)
+app.register_blueprint(auth_bp)
+app.register_blueprint(home_bp)
+app.register_blueprint(ticket_bp)
 
-app.register_blueprint(
-    home_bp
-)
+with app.app_context():
+    db.create_all()
 
-app.register_blueprint(
-    ticket_bp
-)
 
 if __name__ == "__main__":
-
-    app.run(
-        debug=True
-    )
+    app.run(debug=True)

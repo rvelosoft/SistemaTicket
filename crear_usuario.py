@@ -1,21 +1,22 @@
-
-import json
-from pathlib import Path
 from getpass import getpass
-from werkzeug.security import generate_password_hash
 
-ARCHIVO = Path(__file__).resolve().parent / "usuarios.json"
+import bcrypt
+
+from app import app
+from models import db
+from models.user import User
 
 
 def crear_usuario():
-
     usuario = input("Nombre de usuario: ").strip()
+    nombre = input("Nombre completo: ").strip()
+    correo = input("Correo: ").strip()
 
-    if not usuario:
-        print("Debe ingresar un usuario.")
+    if not usuario or not nombre or not correo:
+        print("Usuario, nombre completo y correo son obligatorios.")
         return
 
-    password = getpass("Contraseña: ")
+    password = getpass("Contraseña (mínimo 12 caracteres): ")
     confirmar = getpass("Confirmar contraseña: ")
 
     if len(password) < 12:
@@ -26,33 +27,23 @@ def crear_usuario():
         print("Las contraseñas no coinciden.")
         return
 
-    usuarios = []
+    with app.app_context():
+        if User.query.filter_by(Usuario=usuario).first():
+            print("El usuario ya existe.")
+            return
 
-    if ARCHIVO.exists():
-        with open(ARCHIVO, "r", encoding="utf-8") as f:
-            usuarios = json.load(f)
-
-    if any(
-        u["usuario"].lower() == usuario.lower()
-        for u in usuarios
-    ):
-        print("El usuario ya existe.")
-        return
-
-    usuarios.append({
-        "usuario": usuario,
-        "password_hash": generate_password_hash(
-            password,
-            method="pbkdf2:sha256:600000"
+        user = User(
+            Usuario=usuario,
+            NombreCompleto=nombre,
+            Correo=correo,
+            PasswordHash=bcrypt.hashpw(
+                password.encode("utf-8"),
+                bcrypt.gensalt()
+            ).decode("utf-8"),
+            Activo=True
         )
-    })
-
-    temporal = ARCHIVO.with_suffix(".tmp")
-
-    with open(temporal, "w", encoding="utf-8") as f:
-        json.dump(usuarios, f, indent=4, ensure_ascii=False)
-
-    temporal.replace(ARCHIVO)
+        db.session.add(user)
+        db.session.commit()
 
     print(f"Usuario {usuario} creado correctamente.")
 

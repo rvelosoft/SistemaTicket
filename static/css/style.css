@@ -256,6 +256,132 @@ button:focus-visible,
     margin-top: 10px;
 }
 
+.encabezado-tickets {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.encabezado-tickets h2 {
+    margin-bottom: 6px;
+}
+
+.encabezado-tickets p,
+.sin-tickets p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.acciones-pagina {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.container .acciones-pagina a,
+.container .sin-tickets a {
+    width: auto;
+    padding: 10px 16px;
+    background: var(--dark);
+    color: var(--white);
+}
+
+.container .acciones-pagina a.boton-secundario {
+    border-color: var(--line);
+    background: #edf2f6;
+    color: var(--dark);
+}
+
+.container .acciones-pagina a.boton-secundario:hover {
+    background: #e1e8ef;
+}
+
+.tabla-tickets-contenedor {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.tabla-tickets {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.tabla-tickets th,
+.tabla-tickets td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+}
+
+.tabla-tickets th {
+    background: #f5f7fa;
+    color: var(--dark);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.tabla-tickets tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.tabla-tickets tbody tr:hover {
+    background: #f8fafc;
+}
+
+.tabla-tickets .titulo-ticket {
+    min-width: 160px;
+    font-weight: 700;
+}
+
+.tabla-tickets .descripcion-ticket {
+    min-width: 220px;
+    max-width: 360px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.estado-ticket {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 20px;
+    background: var(--blue-light);
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.estado-cerrado {
+    background: var(--green-light);
+    color: #477a12;
+}
+
+.estado-en-progreso {
+    background: #fff7e6;
+    color: #8a5a00;
+}
+
+.sin-tickets {
+    padding: 30px 20px;
+    border: 1px dashed var(--line);
+    border-radius: 9px;
+    background: #f8fafc;
+    text-align: center;
+}
+
+.sin-tickets h3 {
+    margin: 0 0 8px;
+}
+
+.sin-tickets a {
+    margin-top: 18px;
+}
+
 @media (max-width: 600px) {
     body {
         padding: 12px;
@@ -276,6 +402,19 @@ button:focus-visible,
 
     .container form button,
     .container form + a {
+        width: 100%;
+    }
+
+    .encabezado-tickets {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .acciones-pagina {
+        flex-direction: column;
+    }
+
+    .container .acciones-pagina a {
         width: 100%;
     }
 }

@@ -39,6 +39,22 @@ def nuevo_ticket():
 
 
 @ticket_bp.route(
+    "/tickets"
+)
+@login_required
+def listar_tickets():
+    tickets = Ticket.query.order_by(
+        Ticket.FechaApertura.desc(),
+        Ticket.IdTicket.desc()
+    ).all()
+
+    return render_template(
+        "tickets/listar_tickets.html",
+        tickets=tickets
+    )
+
+
+@ticket_bp.route(
     "/ticket/guardar",
     methods=["POST"]
 )

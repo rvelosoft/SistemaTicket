@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="encabezado-tickets">
+    <div>
+        <h2>Tickets registrados</h2>
+        <p>Consulta los tickets generados en el sistema.</p>
+    </div>
+    <div class="acciones-pagina">
+        <a class="boton-secundario" href="{{ url_for('home.menu') }}">Volver al menú</a>
+        <a href="{{ url_for('tickets.nuevo_ticket') }}">Nuevo ticket</a>
+    </div>
+</div>
+
+{% if tickets %}
+<div class="tabla-tickets-contenedor">
+    <table class="tabla-tickets">
+        <thead>
+            <tr>
+                <th scope="col">N.º</th>
+                <th scope="col">Título</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Apertura</th>
+                <th scope="col">Cierre</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Total HH</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.IdTicket }}</td>
+                <td class="titulo-ticket">{{ ticket.Titulo }}</td>
+                <td class="descripcion-ticket">{{ ticket.Descripcion }}</td>
+                <td>{{ ticket.FechaApertura.strftime('%d/%m/%Y') }}</td>
+                <td>{{ ticket.FechaCierre.strftime('%d/%m/%Y') }}</td>
+                <td>
+                    <span class="estado-ticket estado-{{ ticket.Estado|lower|replace(' ', '-') }}">
+                        {{ ticket.Estado }}
+                    </span>
+                </td>
+                <td>{{ ticket.TotalHH }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="sin-tickets">
+    <h3>Aún no hay tickets</h3>
+    <p>Cuando registres un ticket, aparecerá en esta lista.</p>
+    <a href="{{ url_for('tickets.nuevo_ticket') }}">Crear primer ticket</a>
+</div>
+{% endif %}
+
+{% endblock %}

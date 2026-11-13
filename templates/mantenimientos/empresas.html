@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="encabezado-tickets">
+    <div><h2>Mantención de empresas</h2><p>Administra las empresas asignables a los usuarios.</p></div>
+    <div class="acciones-pagina">
+        <a href="{{ url_for('maintenance.editar_empresa') }}">Crear empresa</a>
+        <a class="boton-secundario" href="{{ url_for('maintenance.index') }}">Volver</a>
+    </div>
+</div>
+{% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, mensaje in mensajes %}
+        <p class="{{ categoria }}">{{ mensaje }}</p>
+    {% endfor %}
+{% endwith %}
+<div class="tabla-tickets-contenedor">
+    <table class="tabla-tickets">
+        <thead><tr><th>Empresa</th><th>Acción</th></tr></thead>
+        <tbody>
+            {% for empresa in empresas %}
+            <tr>
+                <td>{{ empresa.NombreEmpresa }}</td>
+                <td><a href="{{ url_for('maintenance.editar_empresa', empresa_id=empresa.IdEmpresa) }}">Editar</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">No hay empresas registradas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ 'Editar empresa' if empresa.IdEmpresa else 'Crear empresa' }}</h2>
+{% if errores %}
+<div class="errores"><ul>{% for error in errores %}<li>{{ error }}</li>{% endfor %}</ul></div>
+{% endif %}
+<form method="post">
+    <label for="nombre">Nombre de la empresa</label>
+    <input id="nombre" name="nombre" maxlength="200" required value="{{ nombre }}">
+    <button type="submit">Guardar empresa</button>
+</form>
+<a href="{{ url_for('maintenance.empresas') }}">Volver a empresas</a>
+{% endblock %}

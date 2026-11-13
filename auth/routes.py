@@ -41,7 +41,7 @@ def do_login():
         Usuario=usuario
     ).first()
 
-    if user:
+    if user and user.Activo is not False:
 
         if bcrypt.checkpw(
             password.encode(),

@@ -4,27 +4,19 @@
 
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-
-        <div id="modalExito" class="modal">
-
-            <div class="modal-contenido">
-
-                <h2>Operación Exitosa</h2>
-
-                {% for category, message in messages %}
-                    <p>{{ message }}</p>
-                {% endfor %}
-
-                    <button
-                        type="button"
-                        onclick="document.getElementById('modalExito').style.display='none'">
-                        Aceptar
-                    </button>
-
-            </div>
-
+        <div id="notificacionExito" class="notificacion-exito" role="status">
+            {% for category, message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
         </div>
-
+        <script>
+            window.setTimeout(() => {
+                const notification = document.getElementById("notificacionExito");
+                if (notification) {
+                    notification.remove();
+                }
+            }, 4000);
+        </script>
     {% endif %}
 {% endwith %}
 
@@ -40,6 +32,13 @@ Nuevo Ticket
 Consultar Tickets
 </a>
 </li>
+{% if es_administrador %}
+<li>
+<a href="{{ url_for('maintenance.index') }}">
+Mantención de tablas y parámetros
+</a>
+</li>
+{% endif %}
 <li>
 <a href="/logout">
 Cerrar Sesión

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ 'Editar usuario' if usuario.IdUsuario else 'Crear usuario' }}</h2>
+{% if errores %}
+<div class="errores"><ul>{% for error in errores %}<li>{{ error }}</li>{% endfor %}</ul></div>
+{% endif %}
+<form method="post">
+    <label for="usuario">Usuario</label>
+    <input id="usuario" name="usuario" maxlength="100" required value="{{ valores.usuario }}">
+    <label for="nombre">Nombre completo</label>
+    <input id="nombre" name="nombre" maxlength="200" required value="{{ valores.nombre }}">
+    <label for="correo">Correo</label>
+    <input id="correo" name="correo" type="email" maxlength="200" required value="{{ valores.correo }}">
+    <label for="perfil_id">Perfil o rol</label>
+    <select id="perfil_id" name="perfil_id" required>
+        <option value="">Selecciona un perfil</option>
+        {% for perfil in perfiles %}
+        <option value="{{ perfil.IdPerfil }}" {% if valores.perfil_id == perfil.IdPerfil|string %}selected{% endif %}>{{ perfil.NombrePerfil }}</option>
+        {% endfor %}
+    </select>
+    <label for="empresa_id">Empresa asignada</label>
+    <select id="empresa_id" name="empresa_id" required>
+        <option value="">Selecciona una empresa</option>
+        {% for empresa in empresas %}
+        <option value="{{ empresa.IdEmpresa }}" {% if valores.empresa_id == empresa.IdEmpresa|string %}selected{% endif %}>{{ empresa.NombreEmpresa }}</option>
+        {% endfor %}
+    </select>
+    <label for="password">{{ 'Contraseña (dejar vacía para conservarla)' if usuario.IdUsuario else 'Contraseña (mínimo 12 caracteres)' }}</label>
+    <input id="password" name="password" type="password" minlength="12" {% if not usuario.IdUsuario %}required{% endif %} autocomplete="new-password">
+    <label><input type="checkbox" name="activo" {% if valores.activo %}checked{% endif %}> Usuario activo</label>
+    <button type="submit">Guardar usuario</button>
+</form>
+<a href="{{ url_for('maintenance.usuarios') }}">Volver a usuarios</a>
+{% endblock %}

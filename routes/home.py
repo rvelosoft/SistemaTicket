@@ -1,7 +1,8 @@
 from flask import Blueprint
 from flask import render_template
 from flask_login import (
-    login_required
+    login_required,
+    current_user
 )
 
 home_bp = Blueprint(
@@ -14,5 +15,6 @@ home_bp = Blueprint(
 def menu():
 
     return render_template(
-        "menu.html"
+        "menu.html",
+        es_administrador=current_user.EsAdministrador
     )

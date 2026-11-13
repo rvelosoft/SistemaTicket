@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="encabezado-tickets">
+    <div><h2>Mantención de roles y perfiles</h2><p>Define qué perfiles tienen privilegios de administración.</p></div>
+    <div class="acciones-pagina">
+        <a href="{{ url_for('maintenance.editar_perfil') }}">Crear perfil</a>
+        <a class="boton-secundario" href="{{ url_for('maintenance.index') }}">Volver</a>
+    </div>
+</div>
+{% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, mensaje in mensajes %}
+        <p class="{{ categoria }}">{{ mensaje }}</p>
+    {% endfor %}
+{% endwith %}
+<div class="tabla-tickets-contenedor">
+    <table class="tabla-tickets">
+        <thead><tr><th>Perfil</th><th>Administrador</th><th>Acción</th></tr></thead>
+        <tbody>
+            {% for perfil in perfiles %}
+            <tr>
+                <td>{{ perfil.NombrePerfil }}</td>
+                <td>{{ 'Sí' if perfil.EsAdministrador else 'No' }}</td>
+                <td><a href="{{ url_for('maintenance.editar_perfil', perfil_id=perfil.IdPerfil) }}">Editar</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">No hay perfiles registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

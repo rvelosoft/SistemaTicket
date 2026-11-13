@@ -32,5 +32,22 @@ class User(UserMixin, db.Model):
         default=True
     )
 
+    IdPerfil = db.Column(
+        db.Integer,
+        db.ForeignKey("Perfiles.IdPerfil")
+    )
+
+    IdEmpresa = db.Column(
+        db.Integer,
+        db.ForeignKey("Empresas.IdEmpresa")
+    )
+
+    perfil = db.relationship("Perfil")
+    empresa = db.relationship("Empresa")
+
+    @property
+    def EsAdministrador(self):
+        return bool(self.perfil and self.perfil.EsAdministrador)
+
     def get_id(self):
         return str(self.IdUsuario)

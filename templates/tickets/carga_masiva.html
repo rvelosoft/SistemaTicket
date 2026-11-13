@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block container_class %}contenedor-tickets{% endblock %}
+{% block content %}
+<div class="encabezado-tickets">
+    <div>
+        <h2>Ingreso masivo de tickets</h2>
+        <p>Pega filas copiadas desde Excel o completa las celdas directamente.</p>
+    </div>
+    <div class="acciones-pagina">
+        <a class="boton-secundario" href="{{ url_for('tickets.nuevo_ticket') }}">Volver al ingreso individual</a>
+        <a class="boton-secundario" href="{{ url_for('home.menu') }}">Volver al menú</a>
+    </div>
+</div>
+
+<p class="instrucciones-carga">
+    Orden de columnas: Fecha apertura, Fecha cierre, Título, Descripción,
+    Total HH y Estado. Las fechas aceptan AAAA-MM-DD o DD/MM/AAAA; estado:
+    Abierto, En Progreso o Cerrado (sin distinción de mayúsculas/minúsculas).
+    La fecha de cierre puede quedar vacía para estados Abierto o En Progreso.
+</p>
+
+<div id="resultadoCarga" class="resultado-lote" role="status" aria-live="polite" hidden></div>
+
+<div class="acciones-carga-masiva">
+    <button id="agregarFila" type="button">Agregar fila</button>
+    <button id="guardarTickets" type="button">Guardar Todos los Tickets</button>
+</div>
+
+<div class="tabla-carga-masiva-contenedor">
+    <table id="tablaCargaMasiva" class="tabla-carga-masiva">
+        <thead>
+            <tr>
+                <th scope="col">Fecha apertura</th>
+                <th scope="col">Fecha cierre</th>
+                <th scope="col">Título</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Total HH</th>
+                <th scope="col">Estado</th>
+            </tr>
+        </thead>
+        <tbody id="filasTickets"></tbody>
+    </table>
+</div>
+
+<script>
+const camposTicket = [
+    { nombre: "fecha_apertura", etiqueta: "Fecha apertura", maxLength: 10 },
+    { nombre: "fecha_cierre", etiqueta: "Fecha cierre", maxLength: 10 },
+    { nombre: "titulo", etiqueta: "Título", maxLength: 300 },
+    { nombre: "descripcion", etiqueta: "Descripción" },
+    { nombre: "total_hh", etiqueta: "Total HH", maxLength: 20 },
+    { nombre: "estado", etiqueta: "Estado", maxLength: 30 }
+];
+const cuerpoTabla = document.getElementById("filasTickets");
+const tabla = document.getElementById("tablaCargaMasiva");
+const resultado = document.getElementById("resultadoCarga");
+const botonGuardar = document.getElementById("guardarTickets");
+
+function agregarFila(valores = []) {
+    const fila = cuerpoTabla.insertRow();
+    camposTicket.forEach((campo, indice) => {
+        const celda = fila.insertCell();
+        celda.dataset.label = campo.etiqueta;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.dataset.campo = campo.nombre;
+        input.setAttribute("aria-label", campo.etiqueta);
+        input.autocomplete = "off";
+        if (campo.maxLength) {
+            input.maxLength = campo.maxLength;
+        }
+        input.value = valores[indice] || "";
+        celda.appendChild(input);
+    });
+}
+
+for (let fila = 0; fila < 5; fila += 1) {
+    agregarFila();
+}
+
+document.getElementById("agregarFila").addEventListener("click", () => {
+    agregarFila();
+    cuerpoTabla.lastElementChild.querySelector("input").focus();
+});
+
+tabla.addEventListener("paste", (evento) => {
+    const portapapeles = evento.clipboardData;
+    const celdaInicial = evento.target.closest("td");
+    if (!portapapeles || !celdaInicial || !tabla.contains(evento.target)) {
+        return;
+    }
+
+    const texto = portapapeles.getData("text/plain");
+    if (!texto.includes("\t") && !/[\r\n]/.test(texto)) {
+        return;
+    }
+    evento.preventDefault();
+
+    const filasPegadas = texto
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .split("\n");
+    while (filasPegadas.length && filasPegadas[filasPegadas.length - 1] === "") {
+        filasPegadas.pop();
+    }
+
+    const indiceFila = Array.from(cuerpoTabla.rows).indexOf(celdaInicial.parentElement);
+    const indiceColumna = celdaInicial.cellIndex;
+    filasPegadas.forEach((textoFila, desplazamientoFila) => {
+        const celdasPegadas = textoFila.split("\t");
+        const destinoFila = indiceFila + desplazamientoFila;
+        while (destinoFila >= cuerpoTabla.rows.length) {
+            agregarFila();
+        }
+
+        celdasPegadas.forEach((valor, desplazamientoColumna) => {
+            const destinoColumna = indiceColumna + desplazamientoColumna;
+            if (destinoColumna >= camposTicket.length) {
+                return;
+            }
+            cuerpoTabla.rows[destinoFila].cells[destinoColumna]
+                .querySelector("input").value = valor;
+        });
+    });
+});
+
+function mostrarResultado(datos, correcto) {
+    resultado.replaceChildren();
+    resultado.className = correcto
+        ? "resultado-lote exito"
+        : "resultado-lote fallo";
+    const mensaje = document.createElement("p");
+    mensaje.textContent = datos.mensaje;
+    resultado.appendChild(mensaje);
+
+    if (datos.errores && datos.errores.length) {
+        const lista = document.createElement("ul");
+        datos.errores.forEach((error) => {
+            const item = document.createElement("li");
+            item.textContent = error;
+            lista.appendChild(item);
+        });
+        resultado.appendChild(lista);
+    }
+    const botonLimpiar = document.createElement("button");
+    botonLimpiar.type = "button";
+    botonLimpiar.textContent = "Limpiar resultado";
+    botonLimpiar.addEventListener("click", () => {
+        resultado.replaceChildren();
+        resultado.className = "resultado-lote";
+        resultado.hidden = true;
+    });
+    resultado.appendChild(botonLimpiar);
+    resultado.hidden = false;
+}
+
+botonGuardar.addEventListener("click", async () => {
+    const tickets = Array.from(cuerpoTabla.rows).map((fila) => {
+        const ticket = {};
+        fila.querySelectorAll("input").forEach((input) => {
+            ticket[input.dataset.campo] = input.value;
+        });
+        return ticket;
+    });
+
+    botonGuardar.disabled = true;
+    try {
+        const respuesta = await fetch(
+            "{{ url_for('tickets.guardar_tickets_masivos') }}",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ tickets })
+            }
+        );
+        const datos = await respuesta.json();
+        mostrarResultado(datos, respuesta.ok && datos.success);
+        if (respuesta.ok && datos.success) {
+            cuerpoTabla.replaceChildren();
+            for (let fila = 0; fila < 5; fila += 1) {
+                agregarFila();
+            }
+        }
+    } catch (error) {
+        mostrarResultado({
+            mensaje: "No se pudo obtener respuesta del servidor; no se confirmó el guardado.",
+            errores: []
+        }, false);
+    } finally {
+        botonGuardar.disabled = false;
+    }
+});
+</script>
+{% endblock %}

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block container_class %}contenedor-tickets{% endblock %}
 {% block content %}
 
 <div class="encabezado-tickets">
@@ -12,34 +13,114 @@
     </div>
 </div>
 
+{% if errores %}
+<div class="errores" role="alert">
+    <ul>
+        {% for error in errores %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form class="filtros-tickets" method="get">
+    <div class="campo-filtro">
+        <label for="fecha_desde">Fecha desde</label>
+        <input id="fecha_desde" name="fecha_desde" type="date" value="{{ valores_filtro.fecha_desde }}">
+    </div>
+    <div class="campo-filtro">
+        <label for="fecha_hasta">Fecha hasta</label>
+        <input id="fecha_hasta" name="fecha_hasta" type="date" value="{{ valores_filtro.fecha_hasta }}">
+    </div>
+    {% if current_user.EsAdministrador %}
+    <div class="campo-filtro">
+        <label for="empresa_id">Empresa</label>
+        <select id="empresa_id" name="empresa_id">
+            <option value="">Todas las empresas</option>
+            {% for empresa in empresas %}
+            <option value="{{ empresa.IdEmpresa }}" {% if valores_filtro.empresa_id == empresa.IdEmpresa|string %}selected{% endif %}>{{ empresa.NombreEmpresa }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="campo-filtro">
+        <label for="usuario_id">Usuario</label>
+        <select id="usuario_id" name="usuario_id">
+            <option value="">Todos los usuarios</option>
+            {% for usuario in usuarios %}
+            <option value="{{ usuario.IdUsuario }}" {% if valores_filtro.usuario_id == usuario.IdUsuario|string %}selected{% endif %}>{{ usuario.Usuario }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+    <div class="campo-filtro">
+        <label for="estado">Estado</label>
+        <select id="estado" name="estado">
+            <option value="">Todos los estados</option>
+            {% for estado in estados %}
+            <option value="{{ estado }}" {% if valores_filtro.estado == estado %}selected{% endif %}>{{ estado }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="acciones-filtros">
+        <button type="submit">Filtrar</button>
+        <a class="boton-secundario" href="{{ url_for('tickets.listar_tickets') }}">Limpiar</a>
+    </div>
+</form>
+
+{% if current_user.EsAdministrador and not errores %}
+<div class="acciones-exportacion">
+    <span>Exportar resultados:</span>
+    <a href="{{ exportar_excel_url }}">Excel</a>
+    <a href="{{ exportar_csv_url }}">CSV</a>
+</div>
+{% endif %}
+
 {% if tickets %}
 <div class="tabla-tickets-contenedor">
     <table class="tabla-tickets">
         <thead>
             <tr>
                 <th scope="col">N.º</th>
+                {% if current_user.EsAdministrador %}
+                <th scope="col">Usuario</th>
+                <th scope="col">Empresa</th>
+                {% endif %}
                 <th scope="col">Título</th>
                 <th scope="col">Descripción</th>
                 <th scope="col">Apertura</th>
                 <th scope="col">Cierre</th>
                 <th scope="col">Estado</th>
                 <th scope="col">Total HH</th>
+                {% if not current_user.EsAdministrador %}
+                <th scope="col">Acción</th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for ticket in tickets %}
             <tr>
                 <td>{{ ticket.IdTicket }}</td>
+                {% if current_user.EsAdministrador %}
+                <td>{{ ticket.usuario_creacion.Usuario if ticket.usuario_creacion else 'Sin usuario' }}</td>
+                <td>{{ ticket.usuario_creacion.empresa.NombreEmpresa if ticket.usuario_creacion and ticket.usuario_creacion.empresa else 'Sin empresa' }}</td>
+                {% endif %}
                 <td class="titulo-ticket">{{ ticket.Titulo }}</td>
                 <td class="descripcion-ticket">{{ ticket.Descripcion }}</td>
                 <td>{{ ticket.FechaApertura.strftime('%d/%m/%Y') }}</td>
-                <td>{{ ticket.FechaCierre.strftime('%d/%m/%Y') }}</td>
+                <td>{{ ticket.FechaCierre.strftime('%d/%m/%Y') if ticket.FechaCierre else 'Sin fecha' }}</td>
                 <td>
                     <span class="estado-ticket estado-{{ ticket.Estado|lower|replace(' ', '-') }}">
                         {{ ticket.Estado }}
                     </span>
                 </td>
                 <td>{{ ticket.TotalHH }}</td>
+                {% if not current_user.EsAdministrador %}
+                <td>
+                    {% if ticket.UsuarioCreacion == current_user.IdUsuario and ticket.Estado in ('Abierto', 'En Progreso') %}
+                    <a href="{{ url_for('tickets.editar_ticket', ticket_id=ticket.IdTicket) }}">Editar</a>
+                    {% endif %}
+                </td>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
@@ -48,9 +129,36 @@
 {% else %}
 <div class="sin-tickets">
     <h3>Aún no hay tickets</h3>
-    <p>Cuando registres un ticket, aparecerá en esta lista.</p>
-    <a href="{{ url_for('tickets.nuevo_ticket') }}">Crear primer ticket</a>
+
 </div>
+{% endif %}
+
+{% if paginacion and paginacion.total %}
+<nav class="paginacion" aria-label="Paginación de tickets">
+    <span class="resumen-paginacion">
+        Página {{ paginacion.page }} de {{ paginacion.pages }} ·
+        {{ paginacion.total }} tickets
+    </span>
+    <div class="enlaces-paginacion">
+        {% if paginacion.has_prev %}
+        <a href="{{ url_for('tickets.listar_tickets', page=paginacion.prev_num, **filtros_enlace) }}">Anterior</a>
+        {% endif %}
+        {% for numero in paginacion.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+            {% if numero %}
+                {% if numero == paginacion.page %}
+                <span class="pagina-actual" aria-current="page">{{ numero }}</span>
+                {% else %}
+                <a href="{{ url_for('tickets.listar_tickets', page=numero, **filtros_enlace) }}">{{ numero }}</a>
+                {% endif %}
+            {% else %}
+            <span class="separador-paginacion">...</span>
+            {% endif %}
+        {% endfor %}
+        {% if paginacion.has_next %}
+        <a href="{{ url_for('tickets.listar_tickets', page=paginacion.next_num, **filtros_enlace) }}">Siguiente</a>
+        {% endif %}
+    </div>
+</nav>
 {% endif %}
 
 {% endblock %}

@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>Nuevo Ticket</h2>
+<h2>{{ 'Editar Ticket' if modo_edicion else 'Nuevo Ticket' }}</h2>
+
+{% if not current_user.EsAdministrador and not modo_edicion %}
+<div class="acciones-pagina acciones-carga-masiva">
+    <a href="{{ url_for('tickets.carga_masiva') }}">Ingreso masivo de tickets</a>
+</div>
+{% endif %}
 
 {% if errores %}
 <div class="errores" role="alert">
@@ -15,7 +21,7 @@
 {% endif %}
 
 <form
-action="{{ url_for('tickets.guardar_ticket') }}"
+action="{{ url_for('tickets.guardar_ticket', ticket_id=ticket.IdTicket) if modo_edicion else url_for('tickets.guardar_ticket') }}"
 method="POST">
 
 <label>Fecha Apertura</label>
@@ -26,7 +32,7 @@ name="fecha_apertura"
 required
 value="{{ valores.get('fecha_apertura', fecha.strftime('%Y-%m-%d')) }}">
 
-<label>Fecha Cierre</label>
+<label>Fecha Cierre (obligatoria solo para tickets cerrados)</label>
 
 <input
 type="date"
@@ -79,21 +85,27 @@ name="total_hh"
 required
 value="{{ valores.get('total_hh', '') }}">
 
-<button type="submit">
-Guardar
-</button>
+<div class="acciones-formulario">
+    <button type="submit">
+    {{ 'Actualizar' if modo_edicion else 'Guardar' }}
+    </button>
 
-<a href="/menu">
-Cancelar
-</a>
+    <a class="boton-secundario" href="{{ url_for('tickets.listar_tickets') if modo_edicion else url_for('home.menu') }}">
+    Cancelar
+    </a>
+</div>
 
 </form>
 
 <script>
 const fechaApertura = document.querySelector('[name="fecha_apertura"]');
 const fechaCierre = document.querySelector('[name="fecha_cierre"]');
+const estadoTicket = document.querySelector('[name="estado"]');
 
 function validarFechas() {
+    fechaCierre.required = !["Abierto", "En Progreso"].includes(
+        estadoTicket.value
+    );
     fechaCierre.min = fechaApertura.value;
     fechaCierre.setCustomValidity(
         fechaApertura.value &&
@@ -106,6 +118,7 @@ function validarFechas() {
 
 fechaApertura.addEventListener("input", validarFechas);
 fechaCierre.addEventListener("input", validarFechas);
+estadoTicket.addEventListener("change", validarFechas);
 validarFechas();
 </script>
 

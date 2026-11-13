@@ -4,6 +4,7 @@ import bcrypt
 
 from app import app
 from models import db
+from models.role import Perfil
 from models.user import User
 
 
@@ -32,10 +33,27 @@ def crear_usuario():
             print("El usuario ya existe.")
             return
 
+        perfil_admin = Perfil.query.filter_by(EsAdministrador=True).first()
+        perfil_usuario = Perfil.query.filter_by(
+            NombrePerfil="Usuario"
+        ).first()
+        tiene_administrador = User.query.join(Perfil).filter(
+            Perfil.EsAdministrador.is_(True)
+        ).first() is not None
+        perfil = (
+            perfil_usuario
+            if tiene_administrador
+            else perfil_admin
+        )
+        if perfil is None:
+            print("No existen perfiles configurados.")
+            return
+
         user = User(
             Usuario=usuario,
             NombreCompleto=nombre,
             Correo=correo,
+            IdPerfil=perfil.IdPerfil,
             PasswordHash=bcrypt.hashpw(
                 password.encode("utf-8"),
                 bcrypt.gensalt()

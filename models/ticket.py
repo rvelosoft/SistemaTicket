@@ -39,3 +39,8 @@ class Ticket(db.Model):
             "Usuarios.IdUsuario"
         )
     )
+
+    usuario_creacion = db.relationship(
+        "User",
+        foreign_keys=[UsuarioCreacion]
+    )

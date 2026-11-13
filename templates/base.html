@@ -15,7 +15,14 @@ filename='css/style.css') }}">
 
 <body>
 
-<div class="container">
+<div class="container {% block container_class %}{% endblock %}">
+
+{% if current_user.is_authenticated %}
+<header class="usuario-actual">
+    <strong>{{ current_user.NombreCompleto or current_user.Usuario }}</strong>
+    <span>{{ current_user.empresa.NombreEmpresa if current_user.empresa else 'Sin empresa asignada' }}</span>
+</header>
+{% endif %}
 
 {% block content %}
 {% endblock %}

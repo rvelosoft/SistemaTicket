@@ -32,9 +32,10 @@ python configurar_administrador.py
 ```
 
 El mantenedor de tablas y parámetros solo está disponible para usuarios con un
-perfil marcado como administrador. Desde allí se mantienen usuarios, perfiles
-y empresas; cada usuario debe tener un perfil y una empresa asignados para
-guardarse desde el mantenedor.
+perfil marcado como administrador. Desde allí se mantienen usuarios, perfiles,
+tipos de ticket y empresas; cada usuario debe tener un perfil y una empresa
+asignados para guardarse desde el mantenedor. Los tipos iniciales son Incidente,
+Requerimiento y Warnings.
 
 En la consulta de tickets, los administradores pueden filtrar por fecha de
 apertura, empresa, usuario y estado. Los usuarios consultan solo sus propios
@@ -43,11 +44,12 @@ paginación y los administradores pueden exportar todos los resultados filtrados
 a Excel o CSV.
 
 Los usuarios no administradores también pueden ingresar varios tickets desde
-la grilla de carga masiva, pegando columnas copiadas desde Excel. Si alguna fila
-tiene errores, el lote completo se rechaza; las fechas aceptan `AAAA-MM-DD` o
-`DD/MM/AAAA`, Total HH admite coma o punto decimal y la fecha de cierre puede
-omitirse para tickets abiertos o en progreso. El estado pegado desde Excel no
-distingue mayúsculas de minúsculas.
+la grilla de carga masiva, pegando columnas copiadas desde Excel. El orden es
+Fecha apertura, Fecha cierre, Título, Descripción, Total HH, Tipo y Estado. Si
+alguna fila tiene errores, el lote completo se rechaza; las fechas aceptan
+`AAAA-MM-DD` o `DD/MM/AAAA`, Total HH admite coma o punto decimal y la fecha de
+cierre puede omitirse para tickets abiertos o en progreso. El estado y el tipo
+pegados desde Excel no distinguen mayúsculas de minúsculas.
 
 ## Despliegue en Render
 

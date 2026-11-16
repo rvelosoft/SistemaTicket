@@ -61,6 +61,17 @@
             {% endfor %}
         </select>
     </div>
+    <div class="campo-filtro">
+        <label for="tipo_ticket_id">Tipo</label>
+        <select id="tipo_ticket_id" name="tipo_ticket_id">
+            <option value="">Todos los tipos</option>
+            {% for tipo in tipos_ticket %}
+            <option value="{{ tipo.IdTipoTicket }}" {% if valores_filtro.tipo_ticket_id == tipo.IdTipoTicket|string %}selected{% endif %}>
+                {{ tipo.NombreTipo }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
     <div class="acciones-filtros">
         <button type="submit">Filtrar</button>
         <a class="boton-secundario" href="{{ url_for('tickets.listar_tickets') }}">Limpiar</a>
@@ -87,6 +98,7 @@
                 {% endif %}
                 <th scope="col">Título</th>
                 <th scope="col">Descripción</th>
+                <th scope="col">Tipo</th>
                 <th scope="col">Apertura</th>
                 <th scope="col">Cierre</th>
                 <th scope="col">Estado</th>
@@ -106,6 +118,7 @@
                 {% endif %}
                 <td class="titulo-ticket">{{ ticket.Titulo }}</td>
                 <td class="descripcion-ticket">{{ ticket.Descripcion }}</td>
+                <td>{{ ticket.tipo_ticket.NombreTipo if ticket.tipo_ticket else 'Sin tipo' }}</td>
                 <td>{{ ticket.FechaApertura.strftime('%d/%m/%Y') }}</td>
                 <td>{{ ticket.FechaCierre.strftime('%d/%m/%Y') if ticket.FechaCierre else 'Sin fecha' }}</td>
                 <td>

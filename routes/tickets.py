@@ -30,6 +30,7 @@ from openpyxl.styles import Font
 from models.ticket import Ticket
 from models import db
 from models.company import Empresa
+from models.tipo_ticket import TipoTicket
 from models.user import User
 
 ticket_bp = Blueprint(
@@ -46,6 +47,7 @@ CAMPOS_TICKET = (
     "titulo",
     "descripcion",
     "total_hh",
+    "tipo_ticket",
     "estado"
 )
 
@@ -87,7 +89,18 @@ def _parsear_total_hh_ticket(valor):
     return Decimal(normalizado)
 
 
-def _validar_valores_ticket(valores):
+def _obtener_tipos_ticket():
+    return TipoTicket.query.order_by(TipoTicket.NombreTipo).all()
+
+
+def _mapear_tipos_ticket(tipos_ticket):
+    return {
+        tipo.NombreTipo.casefold(): tipo
+        for tipo in tipos_ticket
+    }
+
+
+def _validar_valores_ticket(valores, tipos_por_nombre):
     errores = []
     fechas = {}
 
@@ -96,7 +109,7 @@ def _validar_valores_ticket(valores):
         ("fecha_cierre", "Fecha de cierre")
     ):
         if not valores[campo]:
-            if campo == "fecha_cierre" and valores["estado"] in ESTADOS_EDITABLES:
+            if campo == "fecha_cierre" and valores["estado"] != "Cerrado":
                 continue
             errores.append(f"{etiqueta} es obligatoria.")
             continue
@@ -127,6 +140,10 @@ def _validar_valores_ticket(valores):
     if valores["estado"] not in ESTADOS_VALIDOS:
         errores.append("Selecciona un estado válido.")
 
+    tipo_ticket = tipos_por_nombre.get(valores["tipo_ticket"].casefold())
+    if tipo_ticket is None:
+        errores.append("Selecciona un tipo válido.")
+
     total_hh = None
     if not valores["total_hh"]:
         errores.append("Total HH es obligatorio.")
@@ -142,7 +159,7 @@ def _validar_valores_ticket(valores):
         except InvalidOperation:
             errores.append("Total HH debe ser un número válido.")
 
-    return errores, fechas, total_hh
+    return errores, fechas, total_hh, tipo_ticket
 
 
 @ticket_bp.route(
@@ -158,7 +175,8 @@ def nuevo_ticket():
         fecha=hoy,
         valores={},
         errores=[],
-        modo_edicion=False
+        modo_edicion=False,
+        tipos_ticket=_obtener_tipos_ticket()
     )
 
 
@@ -167,7 +185,10 @@ def nuevo_ticket():
 def carga_masiva():
     if current_user.EsAdministrador:
         abort(403)
-    return render_template("tickets/carga_masiva.html")
+    return render_template(
+        "tickets/carga_masiva.html",
+        tipos_ticket=_obtener_tipos_ticket()
+    )
 
 
 @ticket_bp.route("/tickets/guardar-masivo", methods=["POST"])
@@ -187,6 +208,7 @@ def guardar_tickets_masivos():
 
     errores = []
     tickets_validos = []
+    tipos_por_nombre = _mapear_tipos_ticket(_obtener_tipos_ticket())
     for numero_fila, fila in enumerate(datos["tickets"], start=1):
         if not isinstance(fila, dict):
             errores.append(f"Fila {numero_fila}: datos de fila inválidos.")
@@ -208,7 +230,10 @@ def guardar_tickets_masivos():
             ),
             valores["estado"]
         )
-        errores_fila, fechas, total_hh = _validar_valores_ticket(valores)
+        errores_fila, fechas, total_hh, tipo_ticket = _validar_valores_ticket(
+            valores,
+            tipos_por_nombre
+        )
         if errores_fila:
             errores.append(
                 f"Fila {numero_fila}: {'; '.join(errores_fila)}"
@@ -222,6 +247,7 @@ def guardar_tickets_masivos():
             Descripcion=valores["descripcion"],
             TotalHH=total_hh,
             Estado=valores["estado"],
+            tipo_ticket=tipo_ticket,
             UsuarioCreacion=current_user.IdUsuario
         ))
 
@@ -278,7 +304,12 @@ def editar_ticket(ticket_id):
         "titulo": ticket.Titulo,
         "descripcion": ticket.Descripcion,
         "total_hh": str(ticket.TotalHH),
-        "estado": ticket.Estado
+        "estado": ticket.Estado,
+        "tipo_ticket": (
+            ticket.tipo_ticket.NombreTipo
+            if ticket.tipo_ticket
+            else ""
+        )
     }
 
     return render_template(
@@ -287,7 +318,8 @@ def editar_ticket(ticket_id):
         valores=valores,
         errores=[],
         modo_edicion=True,
-        ticket=ticket
+        ticket=ticket,
+        tipos_ticket=_obtener_tipos_ticket()
     )
 
 
@@ -351,7 +383,8 @@ def listar_tickets():
         exportar_excel_url=exportar_excel_url,
         empresas=empresas,
         usuarios=usuarios,
-        estados=ESTADOS_VALIDOS
+        estados=ESTADOS_VALIDOS,
+        tipos_ticket=_obtener_tipos_ticket()
     ), 400 if errores else 200
 
 
@@ -359,7 +392,8 @@ def _consulta_tickets_filtrada():
     valores_filtro = {
         "fecha_desde": request.args.get("fecha_desde", "").strip(),
         "fecha_hasta": request.args.get("fecha_hasta", "").strip(),
-        "estado": request.args.get("estado", "").strip()
+        "estado": request.args.get("estado", "").strip(),
+        "tipo_ticket_id": request.args.get("tipo_ticket_id", "").strip()
     }
     errores = []
     fecha_desde = None
@@ -387,6 +421,17 @@ def _consulta_tickets_filtrada():
 
     if valores_filtro["estado"] and valores_filtro["estado"] not in ESTADOS_VALIDOS:
         errores.append("Selecciona un estado válido.")
+
+    tipo_ticket_id = None
+    if valores_filtro["tipo_ticket_id"]:
+        try:
+            tipo_ticket_id = int(valores_filtro["tipo_ticket_id"])
+        except ValueError:
+            errores.append("Selecciona un tipo válido.")
+        else:
+            if db.session.get(TipoTicket, tipo_ticket_id) is None:
+                errores.append("El tipo seleccionado no existe.")
+                tipo_ticket_id = None
 
     valores_filtro["empresa_id"] = ""
     valores_filtro["usuario_id"] = ""
@@ -458,6 +503,8 @@ def _consulta_tickets_filtrada():
         )
     if valores_filtro["estado"]:
         consulta = consulta.filter(Ticket.Estado == valores_filtro["estado"])
+    if tipo_ticket_id is not None:
+        consulta = consulta.filter(Ticket.IdTipoTicket == tipo_ticket_id)
     if empresa_id is not None and current_user.EsAdministrador:
         consulta = consulta.filter(User.IdEmpresa == empresa_id)
     if usuario_id is not None and current_user.EsAdministrador:
@@ -483,6 +530,7 @@ def _fila_exportacion(ticket):
         empresa.NombreEmpresa if empresa else "Sin empresa",
         ticket.Titulo or "",
         ticket.Descripcion or "",
+        ticket.tipo_ticket.NombreTipo if ticket.tipo_ticket else "",
         ticket.FechaApertura.strftime("%d/%m/%Y") if ticket.FechaApertura else "",
         ticket.FechaCierre.strftime("%d/%m/%Y") if ticket.FechaCierre else "",
         ticket.Estado or "",
@@ -515,6 +563,7 @@ def exportar_tickets(formato):
         "Empresa",
         "Título",
         "Descripción",
+        "Tipo",
         "Fecha apertura",
         "Fecha cierre",
         "Estado",
@@ -592,7 +641,11 @@ def guardar_ticket(ticket_id=None):
         campo: request.form.get(campo, "").strip()
         for campo in CAMPOS_TICKET
     }
-    errores, fechas, total_hh = _validar_valores_ticket(valores)
+    tipos_ticket = _obtener_tipos_ticket()
+    errores, fechas, total_hh, tipo_ticket = _validar_valores_ticket(
+        valores,
+        _mapear_tipos_ticket(tipos_ticket)
+    )
 
     if errores:
         return render_template(
@@ -601,7 +654,8 @@ def guardar_ticket(ticket_id=None):
             valores=valores,
             errores=errores,
             modo_edicion=ticket_id is not None,
-            ticket=ticket
+            ticket=ticket,
+            tipos_ticket=tipos_ticket
         ), 400
 
     ticket.FechaApertura = fechas["fecha_apertura"]
@@ -610,6 +664,7 @@ def guardar_ticket(ticket_id=None):
     ticket.Descripcion = valores["descripcion"]
     ticket.TotalHH = total_hh
     ticket.Estado = valores["estado"]
+    ticket.tipo_ticket = tipo_ticket
 
     if ticket_id is None:
         ticket.UsuarioCreacion = current_user.IdUsuario

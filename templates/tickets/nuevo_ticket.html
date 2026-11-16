@@ -38,7 +38,7 @@ value="{{ valores.get('fecha_apertura', fecha.strftime('%Y-%m-%d')) }}">
 type="date"
 name="fecha_cierre"
 required
-value="{{ valores.get('fecha_cierre', fecha.strftime('%Y-%m-%d')) }}">
+value="{{ valores.get('fecha_cierre', '') }}">
 
 <label>Estado</label>
 
@@ -59,6 +59,19 @@ En Progreso
 Cerrado
 </option>
 
+</select>
+
+<label for="tipo_ticket">Tipo</label>
+
+<select id="tipo_ticket" name="tipo_ticket" required>
+    <option value="" {% if not valores.get('tipo_ticket') %}selected{% endif %} disabled>
+        Selecciona un tipo
+    </option>
+    {% for tipo in tipos_ticket %}
+    <option value="{{ tipo.NombreTipo }}" {% if valores.get('tipo_ticket') == tipo.NombreTipo %}selected{% endif %}>
+        {{ tipo.NombreTipo }}
+    </option>
+    {% endfor %}
 </select>
 
 <label>Título</label>

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="encabezado-tickets">
+    <div>
+        <h2>Mantención de tipos de ticket</h2>
+        <p>Administra los tipos disponibles al ingresar tickets.</p>
+    </div>
+    <div class="acciones-pagina">
+        <a href="{{ url_for('maintenance.editar_tipo_ticket') }}">Crear tipo</a>
+        <a class="boton-secundario" href="{{ url_for('maintenance.index') }}">Volver</a>
+    </div>
+</div>
+{% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, mensaje in mensajes %}
+        <p class="{{ categoria }}">{{ mensaje }}</p>
+    {% endfor %}
+{% endwith %}
+<div class="tabla-tickets-contenedor">
+    <table class="tabla-tickets">
+        <thead>
+            <tr><th>Tipo</th><th>Acción</th></tr>
+        </thead>
+        <tbody>
+            {% for tipo in tipos_ticket %}
+            <tr>
+                <td>{{ tipo.NombreTipo }}</td>
+                <td>
+                    <a href="{{ url_for('maintenance.editar_tipo_ticket', tipo_id=tipo.IdTipoTicket) }}">Editar</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2">No hay tipos de ticket registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

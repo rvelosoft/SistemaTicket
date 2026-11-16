@@ -14,8 +14,9 @@
 
 <p class="instrucciones-carga">
     Orden de columnas: Fecha apertura, Fecha cierre, Título, Descripción,
-    Total HH y Estado. Las fechas aceptan AAAA-MM-DD o DD/MM/AAAA; estado:
+    Total HH, Tipo y Estado. Las fechas aceptan AAAA-MM-DD o DD/MM/AAAA; estado:
     Abierto, En Progreso o Cerrado (sin distinción de mayúsculas/minúsculas).
+    El tipo también se puede pegar sin distinguir mayúsculas/minúsculas.
     La fecha de cierre puede quedar vacía para estados Abierto o En Progreso.
 </p>
 
@@ -30,11 +31,13 @@
     <table id="tablaCargaMasiva" class="tabla-carga-masiva">
         <thead>
             <tr>
+                <th scope="col">Nº</th>
                 <th scope="col">Fecha apertura</th>
                 <th scope="col">Fecha cierre</th>
                 <th scope="col">Título</th>
                 <th scope="col">Descripción</th>
                 <th scope="col">Total HH</th>
+                <th scope="col">Tipo</th>
                 <th scope="col">Estado</th>
             </tr>
         </thead>
@@ -49,7 +52,16 @@ const camposTicket = [
     { nombre: "titulo", etiqueta: "Título", maxLength: 300 },
     { nombre: "descripcion", etiqueta: "Descripción" },
     { nombre: "total_hh", etiqueta: "Total HH", maxLength: 20 },
-    { nombre: "estado", etiqueta: "Estado", maxLength: 30 }
+    {
+        nombre: "tipo_ticket",
+        etiqueta: "Tipo",
+        opciones: {{ tipos_ticket | map(attribute="NombreTipo") | list | tojson }}
+    },
+    {
+        nombre: "estado",
+        etiqueta: "Estado",
+        opciones: ["Abierto", "En Progreso", "Cerrado"]
+    }
 ];
 const cuerpoTabla = document.getElementById("filasTickets");
 const tabla = document.getElementById("tablaCargaMasiva");
@@ -58,19 +70,59 @@ const botonGuardar = document.getElementById("guardarTickets");
 
 function agregarFila(valores = []) {
     const fila = cuerpoTabla.insertRow();
+    const celdaNumero = fila.insertCell();
+    celdaNumero.className = "numero-fila-carga";
+    celdaNumero.dataset.label = "Nº";
+    celdaNumero.setAttribute("aria-label", "Número de fila");
+
     camposTicket.forEach((campo, indice) => {
         const celda = fila.insertCell();
         celda.dataset.label = campo.etiqueta;
-        const input = document.createElement("input");
-        input.type = "text";
-        input.dataset.campo = campo.nombre;
-        input.setAttribute("aria-label", campo.etiqueta);
-        input.autocomplete = "off";
-        if (campo.maxLength) {
-            input.maxLength = campo.maxLength;
+        const control = campo.opciones
+            ? document.createElement("select")
+            : document.createElement("input");
+        control.dataset.campo = campo.nombre;
+        control.setAttribute("aria-label", campo.etiqueta);
+        if (campo.opciones) {
+            const opcionInicial = document.createElement("option");
+            opcionInicial.value = "";
+            opcionInicial.textContent = "Seleccionar...";
+            control.appendChild(opcionInicial);
+            campo.opciones.forEach((opcion) => {
+                const elementoOpcion = document.createElement("option");
+                elementoOpcion.value = opcion;
+                elementoOpcion.textContent = opcion;
+                control.appendChild(elementoOpcion);
+            });
+        } else {
+            control.type = "text";
+            control.autocomplete = "off";
+            if (campo.maxLength) {
+                control.maxLength = campo.maxLength;
+            }
         }
-        input.value = valores[indice] || "";
-        celda.appendChild(input);
+        control.value = valores[indice] || "";
+        control.addEventListener("input", actualizarNumerosFila);
+        control.addEventListener("change", () => {
+            delete control.dataset.valorPegadoInvalido;
+            control.removeAttribute("aria-invalid");
+            control.removeAttribute("title");
+            actualizarNumerosFila();
+        });
+        celda.appendChild(control);
+    });
+    actualizarNumerosFila();
+}
+
+function actualizarNumerosFila() {
+    Array.from(cuerpoTabla.rows).forEach((fila, indice) => {
+        const tieneDatos = Array.from(
+            fila.querySelectorAll("[data-campo]")
+        ).some((control) => (
+            control.value.trim() !== ""
+            || control.dataset.valorPegadoInvalido
+        ));
+        fila.cells[0].textContent = tieneDatos ? String(indice + 1) : "";
     });
 }
 
@@ -91,10 +143,17 @@ tabla.addEventListener("paste", (evento) => {
     }
 
     const texto = portapapeles.getData("text/plain");
-    if (!texto.includes("\t") && !/[\r\n]/.test(texto)) {
+    const pegadoTabular = texto.includes("\t") || /[\r\n]/.test(texto);
+    if (!pegadoTabular && evento.target.tagName !== "SELECT") {
         return;
     }
     evento.preventDefault();
+
+    if (!pegadoTabular) {
+        aplicarValorPegado(evento.target, texto);
+        actualizarNumerosFila();
+        return;
+    }
 
     const filasPegadas = texto
         .replace(/\r\n/g, "\n")
@@ -114,15 +173,40 @@ tabla.addEventListener("paste", (evento) => {
         }
 
         celdasPegadas.forEach((valor, desplazamientoColumna) => {
-            const destinoColumna = indiceColumna + desplazamientoColumna;
-            if (destinoColumna >= camposTicket.length) {
+            const indiceCampo = indiceColumna + desplazamientoColumna - 1;
+            if (indiceCampo < 0 || indiceCampo >= camposTicket.length) {
                 return;
             }
-            cuerpoTabla.rows[destinoFila].cells[destinoColumna]
-                .querySelector("input").value = valor;
+            const control = cuerpoTabla.rows[destinoFila].cells[indiceCampo + 1]
+                .querySelector("[data-campo]");
+            aplicarValorPegado(control, valor);
         });
     });
+    actualizarNumerosFila();
 });
+
+function aplicarValorPegado(control, valor) {
+    if (control.tagName !== "SELECT") {
+        control.value = valor;
+        return;
+    }
+
+    const valorNormalizado = valor.trim();
+    const opcion = Array.from(control.options).find(
+        (elemento) => elemento.value.toLowerCase() === valorNormalizado.toLowerCase()
+    );
+    if (opcion) {
+        control.value = opcion.value;
+        delete control.dataset.valorPegadoInvalido;
+        control.removeAttribute("aria-invalid");
+        control.removeAttribute("title");
+    } else {
+        control.value = "";
+        control.dataset.valorPegadoInvalido = valorNormalizado;
+        control.setAttribute("aria-invalid", "true");
+        control.title = `Estado pegado no válido: ${valorNormalizado}`;
+    }
+}
 
 function mostrarResultado(datos, correcto) {
     resultado.replaceChildren();
@@ -144,7 +228,7 @@ function mostrarResultado(datos, correcto) {
     }
     const botonLimpiar = document.createElement("button");
     botonLimpiar.type = "button";
-    botonLimpiar.textContent = "Limpiar resultado";
+    botonLimpiar.textContent = "Limpiar";
     botonLimpiar.addEventListener("click", () => {
         resultado.replaceChildren();
         resultado.className = "resultado-lote";
@@ -157,8 +241,10 @@ function mostrarResultado(datos, correcto) {
 botonGuardar.addEventListener("click", async () => {
     const tickets = Array.from(cuerpoTabla.rows).map((fila) => {
         const ticket = {};
-        fila.querySelectorAll("input").forEach((input) => {
-            ticket[input.dataset.campo] = input.value;
+        fila.querySelectorAll("[data-campo]").forEach((control) => {
+            ticket[control.dataset.campo] = (
+                control.dataset.valorPegadoInvalido || control.value
+            );
         });
         return ticket;
     });

@@ -16,6 +16,7 @@ from sqlalchemy.exc import IntegrityError
 from models import db
 from models.company import Empresa
 from models.role import Perfil
+from models.tipo_ticket import TipoTicket
 from models.user import User
 
 
@@ -252,6 +253,75 @@ def editar_perfil(perfil_id=None):
         perfil=perfil,
         nombre=nombre,
         es_administrador=es_administrador,
+        errores=errores
+    )
+
+
+@maintenance_bp.route("/tipos-ticket")
+@login_required
+@admin_required
+def tipos_ticket():
+    return render_template(
+        "mantenimientos/tipos_ticket.html",
+        tipos_ticket=TipoTicket.query.order_by(TipoTicket.NombreTipo).all()
+    )
+
+
+@maintenance_bp.route("/tipos-ticket/nuevo", methods=["GET", "POST"])
+@maintenance_bp.route(
+    "/tipos-ticket/<int:tipo_id>/editar",
+    methods=["GET", "POST"]
+)
+@login_required
+@admin_required
+def editar_tipo_ticket(tipo_id=None):
+    tipo = (
+        db.session.get(TipoTicket, tipo_id)
+        if tipo_id is not None
+        else TipoTicket()
+    )
+    if tipo is None:
+        abort(404)
+
+    errores = []
+    nombre = tipo.NombreTipo or ""
+    if request.method == "POST":
+        nombre = request.form.get("nombre", "").strip()
+        if not nombre:
+            errores.append("El nombre del tipo es obligatorio.")
+        elif len(nombre) > 100:
+            errores.append("El nombre del tipo no puede superar los 100 caracteres.")
+        elif any(
+            otro_tipo.IdTipoTicket != tipo.IdTipoTicket
+            and otro_tipo.NombreTipo.casefold() == nombre.casefold()
+            for otro_tipo in TipoTicket.query.all()
+        ):
+            errores.append("Ya existe un tipo con ese nombre.")
+
+        if errores:
+            return render_template(
+                "mantenimientos/tipo_ticket_form.html",
+                tipo=tipo,
+                nombre=nombre,
+                errores=errores
+            ), 400
+
+        tipo.NombreTipo = nombre
+        db.session.add(tipo)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash("No fue posible guardar el tipo por un nombre duplicado.", "error")
+            return redirect(url_for("maintenance.tipos_ticket"))
+
+        flash("Tipo guardado correctamente.")
+        return redirect(url_for("maintenance.tipos_ticket"))
+
+    return render_template(
+        "mantenimientos/tipo_ticket_form.html",
+        tipo=tipo,
+        nombre=nombre,
         errores=errores
     )
 

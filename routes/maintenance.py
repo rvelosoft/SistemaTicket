@@ -5,6 +5,7 @@ from flask import (
     Blueprint,
     abort,
     flash,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -18,6 +19,7 @@ from models.company import Empresa
 from models.role import Perfil
 from models.tipo_ticket import TipoTicket
 from models.user import User
+from models.work_group import GrupoTrabajo
 
 
 maintenance_bp = Blueprint(
@@ -60,6 +62,19 @@ def usuarios():
     return render_template("mantenimientos/usuarios.html", usuarios=users)
 
 
+@maintenance_bp.route("/empresas/<int:empresa_id>/grupos")
+@login_required
+@admin_required
+def grupos_por_empresa(empresa_id):
+    empresa = db.session.get(Empresa, empresa_id)
+    if empresa is None:
+        abort(404)
+    return jsonify([
+        {"id": grupo.IdGrupo, "nombre": grupo.NombreGrupo}
+        for grupo in empresa.grupos
+    ])
+
+
 @maintenance_bp.route("/usuarios/nuevo", methods=["GET", "POST"])
 @maintenance_bp.route("/usuarios/<int:user_id>/editar", methods=["GET", "POST"])
 @login_required
@@ -77,6 +92,7 @@ def editar_usuario(user_id=None):
         "correo": user.Correo or "",
         "perfil_id": str(user.IdPerfil or ""),
         "empresa_id": str(user.IdEmpresa or ""),
+        "grupo_id": str(user.IdGrupo or ""),
         "activo": user.Activo is not False
     }
     errores = []
@@ -88,6 +104,7 @@ def editar_usuario(user_id=None):
             "correo": request.form.get("correo", "").strip(),
             "perfil_id": request.form.get("perfil_id", ""),
             "empresa_id": request.form.get("empresa_id", ""),
+            "grupo_id": request.form.get("grupo_id", ""),
             "activo": request.form.get("activo") == "on"
         })
         password = request.form.get("password", "")
@@ -111,10 +128,15 @@ def editar_usuario(user_id=None):
 
         perfil = db.session.get(Perfil, valores["perfil_id"])
         empresa = db.session.get(Empresa, valores["empresa_id"])
+        grupo = db.session.get(GrupoTrabajo, valores["grupo_id"])
         if perfil is None:
             errores.append("Selecciona un perfil válido.")
         if empresa is None:
             errores.append("Selecciona una empresa válida.")
+        if grupo is None:
+            errores.append("Selecciona un grupo válido.")
+        elif empresa is not None and grupo not in empresa.grupos:
+            errores.append("El grupo seleccionado no pertenece a la empresa.")
 
         if user_id is None and len(password) < 12:
             errores.append("La contraseña debe tener al menos 12 caracteres.")
@@ -158,6 +180,7 @@ def editar_usuario(user_id=None):
         user.Correo = valores["correo"]
         user.IdPerfil = perfil.IdPerfil
         user.IdEmpresa = empresa.IdEmpresa
+        user.IdGrupo = grupo.IdGrupo
         user.Activo = valores["activo"]
         if password:
             user.PasswordHash = bcrypt.hashpw(
@@ -380,5 +403,106 @@ def editar_empresa(empresa_id=None):
         "mantenimientos/empresa_form.html",
         empresa=empresa,
         nombre=nombre,
+        errores=errores
+    )
+
+
+@maintenance_bp.route("/grupos")
+@login_required
+@admin_required
+def grupos():
+    return render_template(
+        "mantenimientos/grupos.html",
+        grupos=GrupoTrabajo.query.order_by(GrupoTrabajo.NombreGrupo).all()
+    )
+
+
+@maintenance_bp.route("/grupos/nuevo", methods=["GET", "POST"])
+@maintenance_bp.route("/grupos/<int:grupo_id>/editar", methods=["GET", "POST"])
+@login_required
+@admin_required
+def editar_grupo(grupo_id=None):
+    grupo = (
+        db.session.get(GrupoTrabajo, grupo_id)
+        if grupo_id is not None
+        else GrupoTrabajo()
+    )
+    if grupo is None:
+        abort(404)
+
+    empresas = Empresa.query.order_by(Empresa.NombreEmpresa).all()
+    nombre = grupo.NombreGrupo or ""
+    empresa_ids = [str(empresa.IdEmpresa) for empresa in grupo.empresas]
+    errores = []
+
+    if request.method == "POST":
+        nombre = request.form.get("nombre", "").strip()
+        empresa_ids = list(dict.fromkeys(request.form.getlist("empresa_ids")))
+        empresas_seleccionadas = [
+            empresa for empresa in empresas
+            if str(empresa.IdEmpresa) in empresa_ids
+        ]
+
+        if not nombre:
+            errores.append("El nombre del grupo es obligatorio.")
+        elif len(nombre) > 150:
+            errores.append("El nombre del grupo no puede superar los 150 caracteres.")
+        elif any(
+            otro_grupo.IdGrupo != grupo.IdGrupo
+            and otro_grupo.NombreGrupo.casefold() == nombre.casefold()
+            for otro_grupo in GrupoTrabajo.query.all()
+        ):
+            errores.append("Ya existe un grupo con ese nombre.")
+
+        if not empresas_seleccionadas:
+            errores.append("Asigna el grupo al menos a una empresa.")
+        if len(empresas_seleccionadas) != len(empresa_ids):
+            errores.append("Selecciona empresas válidas.")
+        if grupo.IdGrupo:
+            empresas_seleccionadas_ids = {
+                empresa.IdEmpresa for empresa in empresas_seleccionadas
+            }
+            for empresa_actual in grupo.empresas:
+                if (
+                    empresa_actual.IdEmpresa not in empresas_seleccionadas_ids
+                    and User.query.filter_by(
+                        IdEmpresa=empresa_actual.IdEmpresa,
+                        IdGrupo=grupo.IdGrupo
+                    ).first()
+                ):
+                    errores.append(
+                        "No puedes quitar una empresa con usuarios asignados a este grupo."
+                    )
+                    break
+
+        if errores:
+            return render_template(
+                "mantenimientos/grupo_form.html",
+                grupo=grupo,
+                nombre=nombre,
+                empresas=empresas,
+                empresa_ids=empresa_ids,
+                errores=errores
+            ), 400
+
+        grupo.NombreGrupo = nombre
+        grupo.empresas = empresas_seleccionadas
+        db.session.add(grupo)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash("No fue posible guardar el grupo por un nombre duplicado.", "error")
+            return redirect(url_for("maintenance.grupos"))
+
+        flash("Grupo guardado correctamente.")
+        return redirect(url_for("maintenance.grupos"))
+
+    return render_template(
+        "mantenimientos/grupo_form.html",
+        grupo=grupo,
+        nombre=nombre,
+        empresas=empresas,
+        empresa_ids=empresa_ids,
         errores=errores
     )

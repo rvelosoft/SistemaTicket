@@ -25,10 +25,61 @@
         <option value="{{ empresa.IdEmpresa }}" {% if valores.empresa_id == empresa.IdEmpresa|string %}selected{% endif %}>{{ empresa.NombreEmpresa }}</option>
         {% endfor %}
     </select>
+    <label for="grupo_id">Grupo de trabajo</label>
+    <select id="grupo_id" name="grupo_id" required
+        data-url-template="{{ url_for('maintenance.grupos_por_empresa', empresa_id=0) }}"
+        data-grupo-seleccionado="{{ valores.grupo_id }}"
+        {% if not valores.empresa_id %}disabled{% endif %}>
+        <option value="">Selecciona primero una empresa</option>
+    </select>
     <label for="password">{{ 'Contraseña (dejar vacía para conservarla)' if usuario.IdUsuario else 'Contraseña (mínimo 12 caracteres)' }}</label>
     <input id="password" name="password" type="password" minlength="12" {% if not usuario.IdUsuario %}required{% endif %} autocomplete="new-password">
     <label><input type="checkbox" name="activo" {% if valores.activo %}checked{% endif %}> Usuario activo</label>
     <button type="submit">Guardar usuario</button>
 </form>
 <a href="{{ url_for('maintenance.usuarios') }}">Volver a usuarios</a>
+<script>
+    const empresaSelect = document.getElementById("empresa_id");
+    const grupoSelect = document.getElementById("grupo_id");
+
+    async function cargarGrupos() {
+        const empresaId = empresaSelect.value;
+        const grupoSeleccionado = grupoSelect.dataset.grupoSeleccionado;
+        grupoSelect.replaceChildren(new Option(
+            empresaId ? "Cargando grupos..." : "Selecciona primero una empresa",
+            ""
+        ));
+        grupoSelect.disabled = !empresaId;
+        if (!empresaId) return;
+
+        const url = grupoSelect.dataset.urlTemplate.replace(
+            "/0/",
+            `/${empresaId}/`
+        );
+        const respuesta = await fetch(url);
+        if (!respuesta.ok) {
+            grupoSelect.replaceChildren(new Option("No se pudieron cargar los grupos", ""));
+            return;
+        }
+
+        const grupos = await respuesta.json();
+        grupoSelect.replaceChildren(new Option(
+            grupos.length ? "Selecciona un grupo" : "La empresa no tiene grupos",
+            ""
+        ));
+        for (const grupo of grupos) {
+            const opcion = new Option(grupo.nombre, grupo.id);
+            opcion.selected = String(grupo.id) === grupoSeleccionado;
+            grupoSelect.add(opcion);
+        }
+        grupoSelect.disabled = grupos.length === 0;
+        grupoSelect.dataset.grupoSeleccionado = "";
+    }
+
+    empresaSelect.addEventListener("change", () => {
+        grupoSelect.dataset.grupoSeleccionado = "";
+        cargarGrupos();
+    });
+    cargarGrupos();
+</script>
 {% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ 'Editar grupo de trabajo' if grupo.IdGrupo else 'Crear grupo de trabajo' }}</h2>
+{% if errores %}
+<div class="errores"><ul>{% for error in errores %}<li>{{ error }}</li>{% endfor %}</ul></div>
+{% endif %}
+<form method="post">
+    <label for="nombre">Nombre del grupo</label>
+    <input id="nombre" name="nombre" maxlength="150" required value="{{ nombre }}">
+    <fieldset class="seleccion-empresas">
+        <legend>Empresas asociadas</legend>
+        {% for empresa in empresas %}
+        <label>
+            <input type="checkbox" name="empresa_ids" value="{{ empresa.IdEmpresa }}" {% if empresa.IdEmpresa|string in empresa_ids %}checked{% endif %}>
+            {{ empresa.NombreEmpresa }}
+        </label>
+        {% endfor %}
+    </fieldset>
+    <button type="submit">Guardar grupo</button>
+</form>
+<a href="{{ url_for('maintenance.grupos') }}">Volver a grupos</a>
+{% endblock %}

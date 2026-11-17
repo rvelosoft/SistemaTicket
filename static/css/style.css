@@ -129,6 +129,27 @@ input[type="checkbox"] {
     vertical-align: middle;
 }
 
+.seleccion-empresas {
+    display: grid;
+    gap: 8px;
+    margin: 0 0 18px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+}
+
+.seleccion-empresas legend {
+    padding: 0 6px;
+    color: #455a6d;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.seleccion-empresas label {
+    margin: 0;
+    font-weight: 400;
+}
+
 textarea {
     min-height: 120px;
     resize: vertical;
@@ -505,6 +526,10 @@ button:focus-visible,
     width: min(100%, 1400px);
 }
 
+.container.contenedor-mantenimientos {
+    width: min(100%, 1500px);
+}
+
 .container .filtros-tickets {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -612,6 +637,15 @@ button:focus-visible,
     border-collapse: collapse;
     table-layout: fixed;
     text-align: left;
+}
+
+.tabla-usuarios {
+    min-width: 1280px;
+    table-layout: auto;
+}
+
+.tabla-usuarios td {
+    overflow-wrap: anywhere;
 }
 
 .tabla-tickets th,

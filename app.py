@@ -9,6 +9,7 @@ from models.company import Empresa
 from models.role import Perfil
 from models.tipo_ticket import TipoTicket
 from models.user import User
+from models.work_group import GrupoTrabajo
 from routes.home import home_bp
 from routes.maintenance import maintenance_bp
 from routes.tickets import ticket_bp
@@ -47,6 +48,11 @@ with app.app_context():
         db.session.execute(text(
             'ALTER TABLE "Usuarios" ADD COLUMN "IdEmpresa" '
             'INTEGER REFERENCES "Empresas" ("IdEmpresa")'
+        ))
+    if "IdGrupo" not in columnas_usuario:
+        db.session.execute(text(
+            'ALTER TABLE "Usuarios" ADD COLUMN "IdGrupo" '
+            'INTEGER REFERENCES "GruposTrabajo" ("IdGrupo")'
         ))
 
     if not TipoTicket.query.first():

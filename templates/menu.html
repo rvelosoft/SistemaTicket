@@ -21,12 +21,20 @@
 {% endwith %}
 
 <ul>
-<li>
 
+
+    
+{% if not es_administrador %}
+<li>
 <a href="/ticket/nuevo">
 Nuevo Ticket
 </a>
 </li>
+{% endif %}    
+    
+
+
+
 <li>
 <a href="{{ url_for('tickets.listar_tickets') }}">
 Consultar Tickets

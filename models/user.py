@@ -42,8 +42,14 @@ class User(UserMixin, db.Model):
         db.ForeignKey("Empresas.IdEmpresa")
     )
 
+    IdGrupo = db.Column(
+        db.Integer,
+        db.ForeignKey("GruposTrabajo.IdGrupo")
+    )
+
     perfil = db.relationship("Perfil")
     empresa = db.relationship("Empresa")
+    grupo = db.relationship("GrupoTrabajo", back_populates="usuarios")
 
     @property
     def EsAdministrador(self):

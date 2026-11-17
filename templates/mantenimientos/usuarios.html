@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
+{% block container_class %}contenedor-mantenimientos{% endblock %}
 {% block content %}
 <div class="encabezado-tickets">
     <div>
         <h2>Mantención de usuarios</h2>
-        <p>Consulta, crea y actualiza las cuentas, perfiles y empresas asignadas.</p>
+        <p>Consulta y actualiza las cuentas, perfiles, empresas y grupos asignados.</p>
     </div>
     <div class="acciones-pagina">
         <a href="{{ url_for('maintenance.editar_usuario') }}">Crear usuario</a>
@@ -16,9 +17,9 @@
     {% endfor %}
 {% endwith %}
 <div class="tabla-tickets-contenedor">
-    <table class="tabla-tickets">
+    <table class="tabla-tickets tabla-usuarios">
         <thead>
-            <tr><th>Usuario</th><th>Nombre completo</th><th>Correo</th><th>Perfil</th><th>Empresa</th><th>Estado</th><th>Acción</th></tr>
+            <tr><th>Usuario</th><th>Nombre completo</th><th>Correo</th><th>Perfil</th><th>Empresa</th><th>Grupo</th><th>Estado</th><th>Acción</th></tr>
         </thead>
         <tbody>
             {% for usuario in usuarios %}
@@ -28,11 +29,12 @@
                 <td>{{ usuario.Correo }}</td>
                 <td>{{ usuario.perfil.NombrePerfil if usuario.perfil else 'Sin asignar' }}</td>
                 <td>{{ usuario.empresa.NombreEmpresa if usuario.empresa else 'Sin asignar' }}</td>
+                <td>{{ usuario.grupo.NombreGrupo if usuario.grupo else 'Sin asignar' }}</td>
                 <td>{{ 'Activo' if usuario.Activo else 'Inactivo' }}</td>
                 <td><a href="{{ url_for('maintenance.editar_usuario', user_id=usuario.IdUsuario) }}">Editar</a></td>
             </tr>
             {% else %}
-            <tr><td colspan="7">No hay usuarios registrados.</td></tr>
+            <tr><td colspan="8">No hay usuarios registrados.</td></tr>
             {% endfor %}
         </tbody>
     </table>

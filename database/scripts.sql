@@ -5,6 +5,21 @@
 	UNIQUE ("NombreEmpresa")
 );
 
+CREATE TABLE "GruposTrabajo" (
+	"IdGrupo" INTEGER NOT NULL,
+	"NombreGrupo" VARCHAR(150) NOT NULL,
+	PRIMARY KEY ("IdGrupo"),
+	UNIQUE ("NombreGrupo")
+);
+
+CREATE TABLE "EmpresasGrupos" (
+	"IdEmpresa" INTEGER NOT NULL,
+	"IdGrupo" INTEGER NOT NULL,
+	PRIMARY KEY ("IdEmpresa", "IdGrupo"),
+	FOREIGN KEY("IdEmpresa") REFERENCES "Empresas" ("IdEmpresa"),
+	FOREIGN KEY("IdGrupo") REFERENCES "GruposTrabajo" ("IdGrupo")
+);
+
 CREATE TABLE "Perfiles" (
 	"IdPerfil" INTEGER NOT NULL, 
 	"NombrePerfil" VARCHAR(100) NOT NULL, 
@@ -30,10 +45,12 @@ CREATE TABLE "Usuarios" (
 	"Activo" BOOLEAN NOT NULL DEFAULT 1, 
 	"IdPerfil" INTEGER, 
 	"IdEmpresa" INTEGER, 
+	"IdGrupo" INTEGER,
 	PRIMARY KEY ("IdUsuario"), 
 	UNIQUE ("Usuario"),
 	FOREIGN KEY("IdPerfil") REFERENCES "Perfiles" ("IdPerfil"),
-	FOREIGN KEY("IdEmpresa") REFERENCES "Empresas" ("IdEmpresa")
+	FOREIGN KEY("IdEmpresa") REFERENCES "Empresas" ("IdEmpresa"),
+	FOREIGN KEY("IdGrupo") REFERENCES "GruposTrabajo" ("IdGrupo")
 );
 
 CREATE TABLE "Tickets" (

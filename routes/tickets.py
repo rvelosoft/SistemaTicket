@@ -524,10 +524,12 @@ def _valor_exportacion_segura(valor):
 def _fila_exportacion(ticket):
     usuario = ticket.usuario_creacion
     empresa = usuario.empresa if usuario else None
+    grupo = usuario.grupo if usuario else None
     return [
         ticket.IdTicket,
         usuario.Usuario if usuario else "Sin usuario",
         empresa.NombreEmpresa if empresa else "Sin empresa",
+        grupo.NombreGrupo if grupo else "Sin grupo",
         ticket.Titulo or "",
         ticket.Descripcion or "",
         ticket.tipo_ticket.NombreTipo if ticket.tipo_ticket else "",
@@ -561,6 +563,7 @@ def exportar_tickets(formato):
         "N.º",
         "Usuario",
         "Empresa",
+        "Grupo",
         "Título",
         "Descripción",
         "Tipo",

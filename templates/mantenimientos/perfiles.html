@@ -20,7 +20,12 @@
             <tr>
                 <td>{{ perfil.NombrePerfil }}</td>
                 <td>{{ 'Sí' if perfil.EsAdministrador else 'No' }}</td>
-                <td><a href="{{ url_for('maintenance.editar_perfil', perfil_id=perfil.IdPerfil) }}">Editar</a></td>
+                <td>
+                    <a href="{{ url_for('maintenance.editar_perfil', perfil_id=perfil.IdPerfil) }}">Editar</a>
+                    <form method="post" action="{{ url_for('maintenance.eliminar_perfil', perfil_id=perfil.IdPerfil) }}" style="display:inline" onsubmit="return confirm('¿Eliminar este perfil?');">
+                        <button type="submit">Eliminar</button>
+                    </form>
+                </td>
             </tr>
             {% else %}
             <tr><td colspan="3">No hay perfiles registrados.</td></tr>

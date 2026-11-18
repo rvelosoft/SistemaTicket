@@ -32,8 +32,8 @@
         {% if not valores.empresa_id %}disabled{% endif %}>
         <option value="">Selecciona primero una empresa</option>
     </select>
-    <label for="password">{{ 'Contraseña (dejar vacía para conservarla)' if usuario.IdUsuario else 'Contraseña (mínimo 12 caracteres)' }}</label>
-    <input id="password" name="password" type="password" minlength="12" {% if not usuario.IdUsuario %}required{% endif %} autocomplete="new-password">
+    <label for="password">{{ 'Contraseña (dejar vacía para conservarla)' if usuario.IdUsuario else 'Contraseña (mínimo 8 caracteres)' }}</label>
+    <input id="password" name="password" type="password" minlength="8" {% if not usuario.IdUsuario %}required{% endif %} autocomplete="new-password">
     <label><input type="checkbox" name="activo" {% if valores.activo %}checked{% endif %}> Usuario activo</label>
     <button type="submit">Guardar usuario</button>
 </form>

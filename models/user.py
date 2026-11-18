@@ -55,5 +55,12 @@ class User(UserMixin, db.Model):
     def EsAdministrador(self):
         return bool(self.perfil and self.perfil.EsAdministrador)
 
+    @property
+    def EsUsuario(self):
+        return bool(
+            self.perfil
+            and self.perfil.NombrePerfil.casefold() == "usuario"
+        )
+
     def get_id(self):
         return str(self.IdUsuario)

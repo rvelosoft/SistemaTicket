@@ -17,6 +17,7 @@ from sqlalchemy.exc import IntegrityError
 from models import db
 from models.company import Empresa
 from models.role import Perfil
+from models.ticket import Ticket
 from models.tipo_ticket import TipoTicket
 from models.user import User
 from models.work_group import GrupoTrabajo
@@ -45,6 +46,21 @@ def _is_duplicate(model, field, value, item_id=None):
         primary_key = next(iter(model.__table__.primary_key.columns))
         query = query.filter(primary_key != item_id)
     return query.first() is not None
+
+
+def _eliminar_registro(registro, nombre, endpoint):
+    db.session.delete(registro)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        flash(
+            f"No se pudo eliminar {nombre} porque existen datos relacionados.",
+            "error"
+        )
+    else:
+        flash(f"{nombre.capitalize()} eliminado correctamente.")
+    return redirect(url_for(endpoint))
 
 
 @maintenance_bp.route("/")
@@ -138,10 +154,10 @@ def editar_usuario(user_id=None):
         elif empresa is not None and grupo not in empresa.grupos:
             errores.append("El grupo seleccionado no pertenece a la empresa.")
 
-        if user_id is None and len(password) < 12:
-            errores.append("La contraseña debe tener al menos 12 caracteres.")
-        elif password and len(password) < 12:
-            errores.append("La contraseña debe tener al menos 12 caracteres.")
+        if user_id is None and len(password) < 8:
+            errores.append("La contraseña debe tener al menos 8 caracteres.")
+        elif password and len(password) < 8:
+            errores.append("La contraseña debe tener al menos 8 caracteres.")
 
         if errores:
             return render_template(
@@ -505,4 +521,128 @@ def editar_grupo(grupo_id=None):
         empresas=empresas,
         empresa_ids=empresa_ids,
         errores=errores
+    )
+
+
+@maintenance_bp.route("/usuarios/<int:user_id>/eliminar", methods=["POST"])
+@login_required
+@admin_required
+def eliminar_usuario(user_id):
+    usuario = db.session.get(User, user_id)
+    if usuario is None:
+        abort(404)
+    if usuario.IdUsuario == current_user.IdUsuario:
+        flash("No puedes eliminar la cuenta con la que iniciaste sesión.", "error")
+        return redirect(url_for("maintenance.usuarios"))
+    if Ticket.query.filter_by(UsuarioCreacion=usuario.IdUsuario).first():
+        flash(
+            "No se puede eliminar el usuario porque tiene tickets asociados.",
+            "error"
+        )
+        return redirect(url_for("maintenance.usuarios"))
+    if usuario.EsAdministrador and not User.query.join(Perfil).filter(
+        Perfil.EsAdministrador.is_(True),
+        User.IdUsuario != usuario.IdUsuario
+    ).first():
+        flash(
+            "No se puede eliminar el último usuario administrador.",
+            "error"
+        )
+        return redirect(url_for("maintenance.usuarios"))
+    return _eliminar_registro(
+        usuario,
+        "el usuario",
+        "maintenance.usuarios"
+    )
+
+
+@maintenance_bp.route("/perfiles/<int:perfil_id>/eliminar", methods=["POST"])
+@login_required
+@admin_required
+def eliminar_perfil(perfil_id):
+    perfil = db.session.get(Perfil, perfil_id)
+    if perfil is None:
+        abort(404)
+    if User.query.filter_by(IdPerfil=perfil.IdPerfil).first():
+        flash(
+            "No se puede eliminar el perfil porque está asignado a usuarios.",
+            "error"
+        )
+        return redirect(url_for("maintenance.perfiles"))
+    if perfil.EsAdministrador and not Perfil.query.filter(
+        Perfil.EsAdministrador.is_(True),
+        Perfil.IdPerfil != perfil.IdPerfil
+    ).first():
+        flash(
+            "No se puede eliminar el último perfil administrador.",
+            "error"
+        )
+        return redirect(url_for("maintenance.perfiles"))
+    return _eliminar_registro(
+        perfil,
+        "el perfil",
+        "maintenance.perfiles"
+    )
+
+
+@maintenance_bp.route(
+    "/tipos-ticket/<int:tipo_id>/eliminar",
+    methods=["POST"]
+)
+@login_required
+@admin_required
+def eliminar_tipo_ticket(tipo_id):
+    tipo = db.session.get(TipoTicket, tipo_id)
+    if tipo is None:
+        abort(404)
+    if Ticket.query.filter_by(IdTipoTicket=tipo.IdTipoTicket).first():
+        flash(
+            "No se puede eliminar el tipo porque está asociado a tickets.",
+            "error"
+        )
+        return redirect(url_for("maintenance.tipos_ticket"))
+    return _eliminar_registro(
+        tipo,
+        "el tipo de ticket",
+        "maintenance.tipos_ticket"
+    )
+
+
+@maintenance_bp.route("/empresas/<int:empresa_id>/eliminar", methods=["POST"])
+@login_required
+@admin_required
+def eliminar_empresa(empresa_id):
+    empresa = db.session.get(Empresa, empresa_id)
+    if empresa is None:
+        abort(404)
+    if User.query.filter_by(IdEmpresa=empresa.IdEmpresa).first():
+        flash(
+            "No se puede eliminar la empresa porque tiene usuarios asignados.",
+            "error"
+        )
+        return redirect(url_for("maintenance.empresas"))
+    return _eliminar_registro(
+        empresa,
+        "la empresa",
+        "maintenance.empresas"
+    )
+
+
+@maintenance_bp.route("/grupos/<int:grupo_id>/eliminar", methods=["POST"])
+@login_required
+@admin_required
+def eliminar_grupo(grupo_id):
+    grupo = db.session.get(GrupoTrabajo, grupo_id)
+    if grupo is None:
+        abort(404)
+    if User.query.filter_by(IdGrupo=grupo.IdGrupo).first():
+        flash(
+            "No se puede eliminar el grupo porque tiene usuarios asignados.",
+            "error"
+        )
+        return redirect(url_for("maintenance.grupos"))
+    return _eliminar_registro(
+        grupo,
+        "el grupo",
+        "maintenance.grupos"
     )

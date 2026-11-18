@@ -52,7 +52,9 @@ def do_login():
 
             return redirect(
                 url_for(
-                    'home.menu'
+                    'tickets.listar_tickets'
+                    if user.EsUsuario
+                    else 'home.menu'
                 )
             )
 

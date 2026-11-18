@@ -17,11 +17,11 @@ def crear_usuario():
         print("Usuario, nombre completo y correo son obligatorios.")
         return
 
-    password = getpass("Contraseña (mínimo 12 caracteres): ")
+    password = getpass("Contraseña (mínimo 8 caracteres): ")
     confirmar = getpass("Confirmar contraseña: ")
 
-    if len(password) < 12:
-        print("La contraseña debe tener al menos 12 caracteres.")
+    if len(password) < 8:
+        print("La contraseña debe tener al menos 8 caracteres.")
         return
 
     if password != confirmar:

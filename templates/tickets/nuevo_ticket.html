@@ -30,6 +30,7 @@ method="POST">
 type="date"
 name="fecha_apertura"
 required
+max="{{ fecha_actual }}"
 value="{{ valores.get('fecha_apertura', fecha.strftime('%Y-%m-%d')) }}">
 
 <label>Fecha Cierre (obligatoria solo para tickets cerrados)</label>
@@ -103,7 +104,7 @@ value="{{ valores.get('total_hh', '') }}">
     {{ 'Actualizar' if modo_edicion else 'Guardar' }}
     </button>
 
-    <a class="boton-secundario" href="{{ url_for('tickets.listar_tickets') if modo_edicion else url_for('home.menu') }}">
+    <a class="boton-secundario" href="{{ url_for('tickets.listar_tickets') if modo_edicion or current_user.EsUsuario else url_for('home.menu') }}">
     Cancelar
     </a>
 </div>

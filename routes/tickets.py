@@ -128,6 +128,26 @@ def _validar_valores_ticket(valores, tipos_por_nombre):
         errores.append(
             "La fecha de apertura debe ser menor o igual a la fecha de cierre."
         )
+   
+
+    if (
+        "fecha_apertura" in fechas
+        and fechas["fecha_apertura"].date() > datetime.now().date()
+    ):
+        errores.append(
+            "La fecha de apertura no puede ser posterior a la fecha actual."
+        )
+
+
+    if (
+        "fecha_cierre" in fechas
+        and fechas["fecha_cierre"].date() > datetime.now().date()
+    ):
+        errores.append(
+            "La fecha de cierre no puede ser posterior a la fecha actual."
+        )
+
+
 
     if not valores["titulo"]:
         errores.append("El título es obligatorio.")
@@ -173,6 +193,7 @@ def nuevo_ticket():
     return render_template(
         "tickets/nuevo_ticket.html",
         fecha=hoy,
+        fecha_actual=hoy.strftime("%Y-%m-%d"),
         valores={},
         errores=[],
         modo_edicion=False,
@@ -315,6 +336,7 @@ def editar_ticket(ticket_id):
     return render_template(
         "tickets/nuevo_ticket.html",
         fecha=ticket.FechaApertura,
+        fecha_actual=datetime.now().strftime("%Y-%m-%d"),
         valores=valores,
         errores=[],
         modo_edicion=True,
@@ -389,8 +411,20 @@ def listar_tickets():
 
 
 def _consulta_tickets_filtrada():
+    fecha_desde_predeterminada = ""
+    if (
+        "fecha_desde" not in request.args
+        and "fecha_hasta" not in request.args
+    ):
+        fecha_desde_predeterminada = (
+            datetime.now() - timedelta(days=30)
+        ).date().isoformat()
+
     valores_filtro = {
-        "fecha_desde": request.args.get("fecha_desde", "").strip(),
+        "fecha_desde": request.args.get(
+            "fecha_desde",
+            fecha_desde_predeterminada
+        ).strip(),
         "fecha_hasta": request.args.get("fecha_hasta", "").strip(),
         "estado": request.args.get("estado", "").strip(),
         "tipo_ticket_id": request.args.get("tipo_ticket_id", "").strip()
@@ -654,6 +688,7 @@ def guardar_ticket(ticket_id=None):
         return render_template(
             "tickets/nuevo_ticket.html",
             fecha=datetime.now(),
+            fecha_actual=datetime.now().strftime("%Y-%m-%d"),
             valores=valores,
             errores=errores,
             modo_edicion=ticket_id is not None,
@@ -678,7 +713,11 @@ def guardar_ticket(ticket_id=None):
 
     if ticket_id is None:
         flash("Ticket registrado correctamente")
-        return redirect(url_for("home.menu"))
+        return redirect(url_for(
+            "tickets.listar_tickets"
+            if current_user.EsUsuario
+            else "home.menu"
+        ))
 
     flash("Ticket actualizado correctamente")
     return redirect(url_for("tickets.listar_tickets"))

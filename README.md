@@ -37,11 +37,22 @@ tipos de ticket y empresas; cada usuario debe tener un perfil y una empresa
 asignados para guardarse desde el mantenedor. Los tipos iniciales son Incidente,
 Requerimiento y Warnings.
 
+El acceso se realiza con el correo electrónico y la contraseña. En el primer
+ingreso de cada usuario se solicita configurar autenticación de doble factor
+(TOTP) mediante un código QR; los siguientes ingresos no vuelven a solicitar
+el código, salvo que un administrador resetee la verificación desde el
+mantenedor de usuarios.
+
 En la consulta de tickets, los administradores pueden filtrar por fecha de
 apertura, empresa, usuario y estado. Los usuarios consultan solo sus propios
 tickets y pueden filtrar por fecha de apertura y estado. El listado tiene
 paginación y los administradores pueden exportar todos los resultados filtrados
 a Excel o CSV.
+
+El botón Gestión de ticket abre un tablero Kanban con los mismos filtros del
+listado, excepto Estado. Sus tarjetas se pueden mover entre Abierto, En
+Progreso y Cerrado; el cambio actualiza el estado y la fecha de cierre de forma
+asíncrona.
 
 Los usuarios no administradores también pueden ingresar varios tickets desde
 la grilla de carga masiva, pegando columnas copiadas desde Excel. El orden es

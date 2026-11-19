@@ -56,6 +56,15 @@ with app.app_context():
             'ALTER TABLE "Usuarios" ADD COLUMN "IdGrupo" '
             'INTEGER REFERENCES "GruposTrabajo" ("IdGrupo")'
         ))
+    if "totp_secret" not in columnas_usuario:
+        db.session.execute(text(
+            'ALTER TABLE "Usuarios" ADD COLUMN "totp_secret" TEXT'
+        ))
+    if "totp_verificado" not in columnas_usuario:
+        db.session.execute(text(
+            'ALTER TABLE "Usuarios" ADD COLUMN "totp_verificado" '
+            'BOOLEAN NOT NULL DEFAULT 0'
+        ))
 
     if not TipoTicket.query.first():
         db.session.add_all([

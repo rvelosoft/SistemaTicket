@@ -720,6 +720,118 @@ button:focus-visible,
     margin-top: 18px;
 }
 
+.verificacion-2fa-qr {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.verificacion-2fa-qr img {
+    width: 220px;
+    height: 220px;
+    border: 1px solid var(--line);
+}
+
+.verificacion-2fa-secreto {
+    padding: 10px;
+    border-radius: 7px;
+    background: #f5f7fa;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.kanban {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.kanban-columna {
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: #f8fafc;
+}
+
+.kanban-columna.arrastre-activo {
+    border-color: var(--blue);
+    background: var(--blue-light);
+}
+
+.kanban-columna-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.kanban-columna-cabecera h3 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.kanban-contador {
+    min-width: 28px;
+    padding: 2px 8px;
+    border-radius: 16px;
+    background: var(--dark);
+    color: var(--white);
+    text-align: center;
+    font-weight: 700;
+}
+
+.kanban-tarjetas {
+    display: grid;
+    min-height: 120px;
+    gap: 10px;
+    align-content: start;
+}
+
+.kanban-tarjeta {
+    padding: 13px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    cursor: grab;
+}
+
+.kanban-tarjeta.arrastrando {
+    opacity: .5;
+}
+
+.kanban-tarjeta-titulo {
+    margin-bottom: 8px;
+    color: var(--dark);
+    overflow-wrap: anywhere;
+}
+
+.kanban-descripcion {
+    margin-bottom: 10px;
+    color: var(--muted);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.kanban-detalles {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3px 8px;
+    margin: 0;
+    font-size: 12px;
+}
+
+.kanban-detalles dt {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.kanban-detalles dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
 @media (max-width: 600px) {
     body {
         padding: 12px;
@@ -754,6 +866,10 @@ button:focus-visible,
 
     .container .acciones-pagina a {
         width: 100%;
+    }
+
+    .kanban {
+        grid-template-columns: 1fr;
     }
 
     .tabla-carga-masiva,

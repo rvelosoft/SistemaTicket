@@ -27,6 +27,17 @@ class User(UserMixin, db.Model):
         db.String(500)
     )
 
+    totp_secret = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    totp_verificado = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
+
     Activo = db.Column(
         db.Boolean,
         default=True

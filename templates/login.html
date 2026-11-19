@@ -23,12 +23,12 @@
 
 <form action="{{ url_for('auth.do_login') }}" method="POST">
 
-    <label>Usuario</label>
+    <label>Correo electrónico</label>
     <input
-        type="text"
-        name="usuario"
+        type="email"
+        name="correo"
         required
-        autocomplete="username">
+        autocomplete="email">
 
     <label>Contraseña</label>
     <input

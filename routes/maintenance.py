@@ -13,6 +13,7 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 
 from models import db
 from models.company import Empresa
@@ -76,6 +77,25 @@ def index():
 def usuarios():
     users = User.query.order_by(User.Usuario).all()
     return render_template("mantenimientos/usuarios.html", usuarios=users)
+
+
+@maintenance_bp.route("/usuarios/<int:user_id>/resetear-2fa", methods=["POST"])
+@login_required
+@admin_required
+def resetear_2fa(user_id):
+    user = db.session.get(User, user_id)
+    if user is None:
+        abort(404)
+    user.totp_secret = None
+    user.totp_verificado = False
+    try:
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        flash("No se pudo resetear la verificación 2FA.", "error")
+    else:
+        flash("Verificación 2FA reseteada correctamente.")
+    return redirect(url_for("maintenance.usuarios"))
 
 
 @maintenance_bp.route("/empresas/<int:empresa_id>/grupos")

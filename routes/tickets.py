@@ -383,6 +383,11 @@ def listar_tickets():
         for campo, valor in valores_filtro.items()
         if valor
     }
+    filtros_gestion = {
+        campo: valor
+        for campo, valor in filtros_enlace.items()
+        if campo != "estado"
+    }
     exportar_csv_url = url_for(
         "tickets.exportar_tickets",
         formato="csv",
@@ -401,6 +406,7 @@ def listar_tickets():
         errores=errores,
         valores_filtro=valores_filtro,
         filtros_enlace=filtros_enlace,
+        filtros_gestion=filtros_gestion,
         exportar_csv_url=exportar_csv_url,
         exportar_excel_url=exportar_excel_url,
         empresas=empresas,
@@ -410,7 +416,79 @@ def listar_tickets():
     ), 400 if errores else 200
 
 
-def _consulta_tickets_filtrada():
+@ticket_bp.route("/tickets/gestion")
+@login_required
+def gestion_tickets():
+    (
+        consulta,
+        errores,
+        valores_filtro,
+        empresas,
+        usuarios
+    ) = _consulta_tickets_filtrada(incluir_estado=False)
+    tickets = consulta.order_by(
+        Ticket.IdTicket.desc()
+    ).all() if not errores else []
+
+    return render_template(
+        "tickets/gestion_tickets.html",
+        tickets=tickets,
+        errores=errores,
+        valores_filtro=valores_filtro,
+        empresas=empresas,
+        usuarios=usuarios,
+        tipos_ticket=_obtener_tipos_ticket()
+    ), 400 if errores else 200
+
+
+@ticket_bp.route("/ticket/<int:ticket_id>/estado", methods=["POST"])
+@login_required
+def actualizar_estado_ticket(ticket_id):
+    datos = request.get_json(silent=True)
+    estado = datos.get("estado") if isinstance(datos, dict) else None
+    if estado not in ESTADOS_VALIDOS:
+        return jsonify({
+            "success": False,
+            "mensaje": "Selecciona un estado válido."
+        }), 400
+
+    ticket = db.session.get(Ticket, ticket_id)
+    if ticket is None:
+        return jsonify({
+            "success": False,
+            "mensaje": "El ticket no existe."
+        }), 404
+    if not current_user.EsAdministrador and (
+        ticket.UsuarioCreacion != current_user.IdUsuario
+    ):
+        abort(403)
+
+    ticket.Estado = estado
+    ticket.FechaCierre = datetime.now() if estado == "Cerrado" else None
+    try:
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        current_app.logger.exception(
+            "No se pudo actualizar el estado del ticket %s.",
+            ticket_id
+        )
+        return jsonify({
+            "success": False,
+            "mensaje": "No se pudo guardar el nuevo estado."
+        }), 500
+
+    return jsonify({
+        "success": True,
+        "estado": ticket.Estado,
+        "fecha_cierre": (
+            ticket.FechaCierre.strftime("%d/%m/%Y")
+            if ticket.FechaCierre else None
+        )
+    })
+
+
+def _consulta_tickets_filtrada(incluir_estado=True):
     fecha_desde_predeterminada = ""
     if (
         "fecha_desde" not in request.args
@@ -426,9 +504,10 @@ def _consulta_tickets_filtrada():
             fecha_desde_predeterminada
         ).strip(),
         "fecha_hasta": request.args.get("fecha_hasta", "").strip(),
-        "estado": request.args.get("estado", "").strip(),
         "tipo_ticket_id": request.args.get("tipo_ticket_id", "").strip()
     }
+    if incluir_estado:
+        valores_filtro["estado"] = request.args.get("estado", "").strip()
     errores = []
     fecha_desde = None
     fecha_hasta = None
@@ -453,7 +532,11 @@ def _consulta_tickets_filtrada():
     if fecha_desde and fecha_hasta and fecha_desde > fecha_hasta:
         errores.append("La fecha desde debe ser menor o igual a la fecha hasta.")
 
-    if valores_filtro["estado"] and valores_filtro["estado"] not in ESTADOS_VALIDOS:
+    if (
+        incluir_estado
+        and valores_filtro["estado"]
+        and valores_filtro["estado"] not in ESTADOS_VALIDOS
+    ):
         errores.append("Selecciona un estado válido.")
 
     tipo_ticket_id = None
@@ -535,7 +618,7 @@ def _consulta_tickets_filtrada():
                 datetime.min.time()
             )
         )
-    if valores_filtro["estado"]:
+    if incluir_estado and valores_filtro["estado"]:
         consulta = consulta.filter(Ticket.Estado == valores_filtro["estado"])
     if tipo_ticket_id is not None:
         consulta = consulta.filter(Ticket.IdTipoTicket == tipo_ticket_id)

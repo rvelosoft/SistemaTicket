@@ -37,6 +37,12 @@
     <label><input type="checkbox" name="activo" {% if valores.activo %}checked{% endif %}> Usuario activo</label>
     <button type="submit">Guardar usuario</button>
 </form>
+{% if usuario.IdUsuario %}
+<p>Verificación 2FA inicial: <strong>{{ 'Verificado' if usuario.totp_verificado else 'Pendiente' }}</strong></p>
+<form method="post" action="{{ url_for('maintenance.resetear_2fa', user_id=usuario.IdUsuario) }}">
+    <button type="submit" onclick="return confirm('¿Resetear la verificación 2FA de este usuario?');">Resetear 2FA</button>
+</form>
+{% endif %}
 <a href="{{ url_for('maintenance.usuarios') }}">Volver a usuarios</a>
 <script>
     const empresaSelect = document.getElementById("empresa_id");

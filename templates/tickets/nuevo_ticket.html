@@ -1,71 +1,349 @@
+
 {% extends 'base.html' %}
+
+{% block title %}
+{{ 'Editar Ticket' if modo_edicion else 'Nuevo Ticket' }} | Registro de Actividades
+{% endblock %}
+
 {% block content %}
 
-<h2>Nuevo Ticket</h2>
+<div class="ticket-page">
 
-<form
-action="/ticket/guardar"
-method="POST">
+    <!-- ENCABEZADO -->
+    <div class="ticket-page-header">
 
-<label>Fecha Apertura</label>
+        <div>
+            <span class="ticket-eyebrow">
+                REGISTRO DE ACTIVIDADES
+            </span>
 
-<input
-type="date"
-name="fecha_apertura"
-value="{{ fecha.strftime('%Y-%m-%d') }}">
+            <h2>{{ 'Editar Ticket' if modo_edicion else 'Nuevo Ticket' }}</h2>
 
-<label>Fecha Cierre</label>
+            <p>
+                {{ 'Modifica la información del ticket seleccionado.'
+                   if modo_edicion
+                   else 'Ingresa los datos necesarios para registrar un nuevo ticket.' }}
+            </p>
+        </div>
 
-<input
-type="date"
-name="fecha_cierre"
-value="{{ fecha.strftime('%Y-%m-%d') }}">
+        {% if not current_user.EsAdministrador and not modo_edicion %}
+        <a href="{{ url_for('tickets.carga_masiva') }}"
+           class="ticket-secondary-action">
+            <span>▤</span>
+            Ingreso masivo de tickets
+            <span class="action-arrow">→</span>
+        </a>
+        {% endif %}
 
-<label>Estado</label>
+    </div>
 
-<select name="estado">
 
-<option value="Abierto">
-Abierto
-</option>
+    <!-- ERRORES DE VALIDACIÓN -->
+    {% if errores %}
 
-<option value="En Progreso">
-En Progreso
-</option>
+    <div class="ticket-errors" role="alert">
 
-<option value="Cerrado">
-Cerrado
-</option>
+        <div class="ticket-message-icon">!</div>
 
-</select>
+        <div>
+            <strong>Revisa los siguientes campos:</strong>
 
-<label>Título</label>
+            <ul>
+                {% for error in errores %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
 
-<input
-type="text"
-name="titulo">
+    </div>
 
-<label>Descripción</label>
+    {% endif %}
 
-<textarea
-name="descripcion">
-</textarea>
 
-<label>Total HH</label>
+    <!-- FORMULARIO -->
+    <section class="ticket-form-card">
 
-<input
-type="number"
-step="0.5"
-name="total_hh">
+        <div class="ticket-form-heading">
 
-<button type="submit">
-Guardar
-</button>
+            <div class="ticket-form-icon">▤</div>
 
-<a href="/menu">
-Cancelar
-</a>
+            <div>
+                <h3>Información del ticket</h3>
+                <p>Completa los campos del formulario</p>
+            </div>
 
-</form>
+        </div>
+
+
+        <form
+            id="ticketForm"
+            action="{{ url_for('tickets.guardar_ticket', ticket_id=ticket.IdTicket) if modo_edicion else url_for('tickets.guardar_ticket') }}"
+            method="POST"
+            class="ticket-form">
+
+
+            <!-- FILA 1: FECHAS -->
+
+            <div class="ticket-form-grid">
+
+                <div class="ticket-field">
+
+                    <label for="fecha_apertura">
+                        Fecha de apertura
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="date"
+                        id="fecha_apertura"
+                        name="fecha_apertura"
+                        required
+                        value="{{ valores.get('fecha_apertura', fecha.strftime('%Y-%m-%d')) }}">
+
+                </div>
+
+
+                <div class="ticket-field">
+
+                    <label for="fecha_cierre">
+                        Fecha de cierre
+                        <span class="optional">(según estado)</span>
+                    </label>
+
+                    <input
+                        type="date"
+                        id="fecha_cierre"
+                        name="fecha_cierre"
+                        value="{{ valores.get('fecha_cierre', '') }}">
+
+                    <small>
+                        Obligatoria únicamente para tickets cerrados.
+                    </small>
+
+                </div>
+
+
+                <!-- FILA 2: ESTADO Y TIPO -->
+
+                <div class="ticket-field">
+
+                    <label for="estado">
+                        Estado
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="estado" name="estado" required>
+
+                        <option value=""
+                            {% if not valores.get('estado') %}selected{% endif %}
+                            disabled>
+                            Selecciona un estado
+                        </option>
+
+                        <option value="Abierto"
+                            {% if valores.get('estado') == 'Abierto' %}selected{% endif %}>
+                            Abierto
+                        </option>
+
+                        <option value="En Progreso"
+                            {% if valores.get('estado') == 'En Progreso' %}selected{% endif %}>
+                            En Progreso
+                        </option>
+
+                        <option value="Cerrado"
+                            {% if valores.get('estado') == 'Cerrado' %}selected{% endif %}>
+                            Cerrado
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="ticket-field">
+
+                    <label for="tipo_ticket">
+                        Tipo de ticket
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="tipo_ticket" name="tipo_ticket" required>
+
+                        <option value=""
+                            {% if not valores.get('tipo_ticket') %}selected{% endif %}
+                            disabled>
+                            Selecciona un tipo
+                        </option>
+
+                        {% for tipo in tipos_ticket %}
+
+                        <option value="{{ tipo.NombreTipo }}"
+                            {% if valores.get('tipo_ticket') == tipo.NombreTipo %}selected{% endif %}>
+                            {{ tipo.NombreTipo }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- FILA 3: TÍTULO -->
+
+                <div class="ticket-field full-width">
+
+                    <label for="titulo">
+                        Título
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="titulo"
+                        name="titulo"
+                        maxlength="300"
+                        required
+                        placeholder="Ingresa el título del ticket"
+                        value="{{ valores.get('titulo', '') }}">
+
+                </div>
+
+
+                <!-- FILA 4: DESCRIPCIÓN -->
+
+                <div class="ticket-field full-width">
+
+                    <label for="descripcion">
+                        Descripción
+                    </label>
+
+                    <textarea
+                        id="descripcion"
+                        name="descripcion"
+                        rows="5"
+                        placeholder="Describe detalladamente el requerimiento o actividad...">{{ valores.get('descripcion', '') }}</textarea>
+
+                </div>
+
+
+                <!-- FILA 5: HORAS -->
+
+                <div class="ticket-field">
+
+                    <label for="total_hh">
+                        Total HH
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="total_hh"
+                        step="0.5"
+                        min="0"
+                        max="99999999.99"
+                        name="total_hh"
+                        required
+                        placeholder="Ej. 2.5"
+                        value="{{ valores.get('total_hh', '') }}">
+
+                    <small>
+                        Ingrese el total de horas hombre.
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACCIONES -->
+
+            <div class="ticket-form-footer">
+
+                <span class="ticket-required-note">
+                    <span class="required">*</span>
+                    Campos obligatorios
+                </span>
+
+                <div class="ticket-form-actions">
+
+                    <a class="ticket-cancel-button"
+                       href="{{ url_for('tickets.listar_tickets') if modo_edicion else url_for('home.menu') }}">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="ticket-save-button">
+                        <span>✓</span>
+                        {{ 'Actualizar ticket' if modo_edicion else 'Guardar ticket' }}
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
+
+
+<!-- =====================================
+     VALIDACIÓN DINÁMICA DE FECHAS
+====================================== -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const fechaApertura = document.querySelector(
+        '[name="fecha_apertura"]'
+    );
+
+    const fechaCierre = document.querySelector(
+        '[name="fecha_cierre"]'
+    );
+
+    const estadoTicket = document.querySelector(
+        '[name="estado"]'
+    );
+
+    if (!fechaApertura || !fechaCierre || !estadoTicket) {
+        return;
+    }
+
+    function validarFechas() {
+
+        const requiereCierre = estadoTicket.value === "Cerrado";
+
+        fechaCierre.required = requiereCierre;
+        fechaCierre.min = fechaApertura.value || "";
+
+        if (!fechaCierre.value) {
+            fechaCierre.setCustomValidity("");
+            return;
+        }
+
+        if (
+            fechaApertura.value &&
+            fechaCierre.value < fechaApertura.value
+        ) {
+            fechaCierre.setCustomValidity(
+                "La fecha de cierre debe ser igual o posterior a la fecha de apertura."
+            );
+        } else {
+            fechaCierre.setCustomValidity("");
+        }
+    }
+
+    fechaApertura.addEventListener("input", validarFechas);
+    fechaCierre.addEventListener("input", validarFechas);
+    estadoTicket.addEventListener("change", validarFechas);
+
+    validarFechas();
+
+});
+
+</script>
 
 {% endblock %}

@@ -12,6 +12,7 @@ from models.user import User
 from models.work_group import GrupoTrabajo
 from routes.home import home_bp
 from routes.maintenance import maintenance_bp
+from routes.estadisticas import estadisticas_bp
 from routes.tickets import ticket_bp
 
 app = Flask(__name__)
@@ -32,6 +33,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(home_bp)
 app.register_blueprint(ticket_bp)
 app.register_blueprint(maintenance_bp)
+app.register_blueprint(estadisticas_bp)
 
 with app.app_context():
     db.create_all()

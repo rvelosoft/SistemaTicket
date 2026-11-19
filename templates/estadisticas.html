@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+
+{% block container_class %}estadisticas-container{% endblock %}
+
+{% block content %}
+<style>
+.estadisticas-container{width:min(100%,1440px);padding:28px;border:0;border-radius:0;background:transparent;box-shadow:none}
+.estadisticas-page{--stats-bg:#f4f7fb;--stats-panel:#fff;--stats-text:#172033;--stats-muted:#667085;--stats-line:#e5eaf1;--stats-blue:#2563eb;--stats-red:#dc5b5b;--stats-green:#15966b;--stats-orange:#d98a19;--stats-shadow:0 8px 24px rgba(20,35,60,.06);color:var(--stats-text);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+.estadisticas-page .header{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:24px}
+.estadisticas-page .eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--stats-blue);text-transform:uppercase}
+.estadisticas-page h1{font-size:26px;margin:3px 0 2px;color:var(--stats-text)}
+.estadisticas-page .subtitle{color:var(--stats-muted);margin:0}
+.estadisticas-page .actions{display:flex;gap:10px;flex-wrap:wrap}
+.estadisticas-page button,.estadisticas-page .actions a{border:0;border-radius:8px;padding:10px 15px;font-weight:650;cursor:pointer;background:var(--stats-blue);color:#fff;text-decoration:none}
+.estadisticas-page .actions a.secondary,.estadisticas-page button.secondary{background:#e9eef8;color:#26354d}
+.estadisticas-page button:disabled{opacity:.55;cursor:wait}
+.estadisticas-page .filter-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:end;gap:14px;margin-bottom:20px}
+.estadisticas-page .filter-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.estadisticas-page .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.estadisticas-page .card,.estadisticas-page .panel{background:var(--stats-panel);border:1px solid var(--stats-line);border-radius:13px;box-shadow:var(--stats-shadow)}
+.estadisticas-page .card{padding:17px 19px}
+.estadisticas-page .filter-controls label{font-size:12px;color:var(--stats-muted);font-weight:650;margin:0}
+.estadisticas-page .filter-controls select{width:100%;min-width:0;min-height:44px;margin:0;border:1px solid var(--stats-line);border-radius:8px;background:#fff;color:var(--stats-text);padding:8px 12px;font:inherit}
+.estadisticas-page .filter-controls button{width:100%;min-height:44px;margin:0;background:#e9eef8;color:#26354d}
+.estadisticas-page .card .label{color:var(--stats-muted);font-size:12px;font-weight:650}
+.estadisticas-page .card .value{font-size:30px;font-weight:750;line-height:1.25;margin-top:5px}
+.estadisticas-page .card .hint{font-size:11px;color:var(--stats-muted);margin-top:4px}
+.estadisticas-page .panel{padding:20px;margin-bottom:18px}
+.estadisticas-page .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.estadisticas-page h2{font-size:16px;margin:0;color:var(--stats-text)}
+.estadisticas-page .panel-note{font-size:12px;color:var(--stats-muted);margin-top:3px}
+.estadisticas-page .legend{display:flex;gap:14px;flex-wrap:wrap}
+.estadisticas-page .legend label{display:flex;align-items:center;gap:6px;color:#475467;font-size:12px;cursor:pointer;margin:0}
+.estadisticas-page .legend input{width:auto;min-height:0;margin:0;accent-color:var(--stats-blue)}
+.estadisticas-page .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.estadisticas-page .chart-wrap{position:relative;width:100%;height:360px}
+.estadisticas-page .chart-tooltip{position:absolute;z-index:5;display:none;pointer-events:none;min-width:125px;padding:9px 11px;background:#172033;color:#fff;border-radius:8px;box-shadow:0 5px 18px rgba(0,0,0,.18);font-size:12px;line-height:1.55;white-space:nowrap}
+.estadisticas-page .chart-tooltip strong{display:block;font-size:12px;margin-bottom:3px}
+.estadisticas-page .chart-tooltip .tip-row{display:flex;align-items:center;gap:7px}
+.estadisticas-page .chart-tooltip .tip-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.estadisticas-page canvas{width:100%;height:100%;display:block}
+.estadisticas-page .query-status{color:var(--stats-muted);font-size:12px;margin:10px 0 0;min-height:18px}
+.estadisticas-page .query-error{color:#b42318;font-size:13px;margin:10px 0 0}
+.estadisticas-page .table-wrap{overflow-x:auto}
+.estadisticas-page table{border-collapse:collapse;width:100%;font-size:13px}
+.estadisticas-page th,.estadisticas-page td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--stats-line);white-space:nowrap}
+.estadisticas-page th{color:#667085;font-size:11px;text-transform:uppercase;letter-spacing:.04em;background:#f8fafc}
+.estadisticas-page th:first-child,.estadisticas-page td:first-child{text-align:left}
+.estadisticas-page tbody tr:hover{background:#f8fafc}
+.estadisticas-page tfoot{font-weight:750;background:#f8fafc}
+.estadisticas-page .empty{text-align:center!important;color:var(--stats-muted);padding:28px}
+@media(max-width:850px){.estadisticas-page .filter-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.estadisticas-page .cards{grid-template-columns:repeat(2,minmax(0,1fr))}.estadisticas-page .header{align-items:flex-start;flex-direction:column}.estadisticas-page .chart-wrap{height:300px}}
+@media(max-width:480px){.estadisticas-container{padding:15px}.estadisticas-page .filter-controls{grid-template-columns:1fr;gap:10px}.estadisticas-page .cards{gap:9px}.estadisticas-page .card{padding:13px}.estadisticas-page .card .value{font-size:25px}.estadisticas-page .panel{padding:14px}.estadisticas-page .chart-wrap{height:260px}}
+</style>
+
+<main class="estadisticas-page">
+    <header class="header">
+        <div>
+            <div class="eyebrow">ABENIS · Gestión de servicios</div>
+            <h1>Estadísticas mensuales</h1>
+            <p class="subtitle">Evolución de incidentes, requerimientos y warnings · año seleccionado</p>
+        </div>
+        <div class="actions">
+            <a class="secondary" href="{{ url_for('home.menu') }}">Volver al menú</a>
+        </div>
+    </header>
+
+    <section class="filter-controls" aria-label="Filtros de consulta">
+        <div class="filter-field">
+            <label for="filtroEmpresa">Empresa <span aria-hidden="true">*</span></label>
+            <select id="filtroEmpresa" required aria-label="Seleccionar empresa">
+                <option value="">Selecciona una empresa</option>
+                {% for empresa in empresas %}
+                <option value="{{ empresa.IdEmpresa }}">{{ empresa.NombreEmpresa }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-field">
+            <label for="filtroUsuario">Usuario</label>
+            <select id="filtroUsuario" aria-label="Seleccionar usuario" disabled>
+                <option value="">Selecciona una empresa primero</option>
+            </select>
+        </div>
+        <div class="filter-field">
+            <label for="filtroAnio">Año de consulta <span aria-hidden="true">*</span></label>
+            <select id="filtroAnio" required aria-label="Seleccionar año">
+                <option value="">Selecciona un año</option>
+                {% for anio in anios %}
+                <option value="{{ anio }}">{{ anio }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="secondary" id="btnActualizar" type="button" disabled>Actualizar datos</button>
+    </section>
+
+    <section class="cards">
+        <article class="card"><div class="label">Incidentes · año</div><div class="value" id="kpiInc">—</div><div class="hint">Total acumulado</div></article>
+        <article class="card"><div class="label">Requerimientos · año</div><div class="value" id="kpiReq">—</div><div class="hint">Total acumulado</div></article>
+        <article class="card"><div class="label">Warnings · año</div><div class="value" id="kpiWarning">—</div><div class="hint">Total acumulado</div></article>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <div>
+                <h2>Comportamiento mensual por tipo</h2>
+                <div class="panel-note">Cada punto representa un período del día 10 al día 9 del mes siguiente. Los períodos sin tickets se muestran en cero.</div>
+            </div>
+            <div class="legend">
+                <label><input type="checkbox" data-series="inc" checked><span class="dot" style="background:#dc5b5b"></span>Incidentes</label>
+                <label><input type="checkbox" data-series="req" checked><span class="dot" style="background:#2563eb"></span>REQ</label>
+                <label><input type="checkbox" data-series="warning" checked><span class="dot" style="background:#d98a19"></span>Warnings</label>
+            </div>
+        </div>
+        <div class="chart-wrap" id="chartWrap">
+            <canvas id="chartMensual" aria-label="Gráfico de evolución mensual. Mueve el cursor sobre los puntos para ver sus valores." role="img"></canvas>
+            <div class="chart-tooltip" id="chartTooltip" role="status" aria-live="polite"></div>
+        </div>
+        <p class="query-status" id="estadoConsulta" aria-live="polite"></p>
+        <p class="query-error" id="errorConsulta" role="alert" hidden></p>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <div>
+                <h2>Detalle del año seleccionado</h2>
+                <div class="panel-note">Totales mensuales según los tickets registrados para los filtros seleccionados.</div>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Período</th><th>Incidentes</th><th>REQ</th><th>Warnings</th><th>Total</th></tr></thead>
+                <tbody id="tablaMeses"><tr><td colspan="5" class="empty">Selecciona una empresa y un año para consultar.</td></tr></tbody>
+                <tfoot id="pieTabla"></tfoot>
+            </table>
+        </div>
+    </section>
+</main>
+
+<script>
+const SERIES={inc:{label:"Incidentes",color:"#dc5b5b"},req:{label:"REQ",color:"#2563eb"},warning:{label:"Warnings",color:"#d98a19"}};
+let datosMeses=[];
+const numero=v=>Number(v||0);
+const formato=v=>numero(v).toLocaleString("es-CL");
+const nombreMes=(anio,mes)=>new Date(anio,mes-1,1).toLocaleDateString("es-CL",{month:"short",year:"2-digit"}).replace(".","");
+const empresa=document.getElementById("filtroEmpresa");
+const usuario=document.getElementById("filtroUsuario");
+const anio=document.getElementById("filtroAnio");
+const boton=document.getElementById("btnActualizar");
+const estadoConsulta=document.getElementById("estadoConsulta");
+const errorConsulta=document.getElementById("errorConsulta");
+let geometriaGrafico=null;
+
+function actualizarBoton(){boton.disabled=!(empresa.value&&anio.value);}
+
+function mostrarError(mensaje){
+  errorConsulta.textContent=mensaje;
+  errorConsulta.hidden=false;
+  estadoConsulta.textContent="";
+}
+
+async function cargarUsuarios(){
+  usuario.disabled=true;
+  usuario.replaceChildren(new Option("Cargando usuarios...",""));
+  if(!empresa.value){
+    usuario.replaceChildren(new Option("Selecciona una empresa primero",""));
+    actualizarBoton();
+    return;
+  }
+  try{
+    const respuesta=await fetch(`/estadisticas/api/usuarios?empresa_id=${encodeURIComponent(empresa.value)}`,{cache:"no-store"});
+    const datos=await respuesta.json();
+    if(!respuesta.ok)throw new Error(datos.error||"No se pudieron cargar los usuarios.");
+    usuario.replaceChildren(new Option("Todos",""));
+    datos.forEach(item=>usuario.add(new Option(item.nombre,String(item.id))));
+    usuario.disabled=false;
+  }catch(error){
+    usuario.replaceChildren(new Option("No se pudieron cargar los usuarios",""));
+    mostrarError(error.message);
+  }
+  actualizarBoton();
+}
+
+async function cargarDatos(){
+  if(!empresa.value||!anio.value)return;
+  boton.disabled=true;
+  errorConsulta.textContent="";
+  errorConsulta.hidden=true;
+  estadoConsulta.textContent="";
+  try{
+    const parametros=new URLSearchParams({empresa_id:empresa.value,anio:anio.value,usuario_id:usuario.value});
+    const respuesta=await fetch(`/estadisticas/api?${parametros}`,{cache:"no-store"});
+    const datos=await respuesta.json();
+    if(!respuesta.ok)throw new Error(datos.error||"No se pudieron consultar las estadísticas.");
+    datosMeses=datos.periodos.map(periodo=>({...periodo,label:nombreMes(periodo.anio,periodo.mes)}));
+    actualizarPantalla();
+    estadoConsulta.textContent=`Última consulta: ${new Date().toLocaleString("es-CL")}.`;
+  }catch(error){
+    datosMeses=[];
+    actualizarPantalla();
+    mostrarError(error.message);
+  }finally{
+    actualizarBoton();
+  }
+}
+
+function actualizarPantalla(){
+  const campos=["inc","req","warning"];
+  const sumas={};
+  campos.forEach(campo=>sumas[campo]=datosMeses.reduce((suma,mes)=>suma+numero(mes[campo]),0));
+  document.getElementById("kpiInc").textContent=datosMeses.length?formato(sumas.inc):"—";
+  document.getElementById("kpiReq").textContent=datosMeses.length?formato(sumas.req):"—";
+  document.getElementById("kpiWarning").textContent=datosMeses.length?formato(sumas.warning):"—";
+  const cuerpo=document.getElementById("tablaMeses");
+  if(!datosMeses.length){
+    cuerpo.innerHTML='<tr><td colspan="5" class="empty">No hay datos para mostrar.</td></tr>';
+    document.getElementById("pieTabla").replaceChildren();
+  }else{
+    cuerpo.innerHTML=datosMeses.map(mes=>`<tr><td>${mes.label}</td><td>${formato(mes.inc)}</td><td>${formato(mes.req)}</td><td>${formato(mes.warning)}</td><td><b>${formato(mes.total)}</b></td></tr>`).join("");
+    document.getElementById("pieTabla").innerHTML=`<tr><td>Total anual</td><td>${formato(sumas.inc)}</td><td>${formato(sumas.req)}</td><td>${formato(sumas.warning)}</td><td>${formato(campos.reduce((suma,campo)=>suma+sumas[campo],0))}</td></tr>`;
+  }
+  dibujarGrafico();
+}
+
+function dibujarGrafico(){
+  const canvas=document.getElementById("chartMensual");
+  const rect=canvas.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.max(1,Math.round(rect.width*dpr));
+  canvas.height=Math.max(1,Math.round(rect.height*dpr));
+  const ctx=canvas.getContext("2d");
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const w=rect.width,h=rect.height,pad={l:48,r:18,t:18,b:42};
+  const plotW=w-pad.l-pad.r,plotH=h-pad.t-pad.b;
+  const visibles=[...document.querySelectorAll("[data-series]:checked")].map(element=>element.dataset.series);
+  const maxDato=Math.max(1,...datosMeses.flatMap(mes=>visibles.map(clave=>numero(mes[clave]))));
+  const max=Math.ceil(maxDato/5)*5||1;
+  const x=indice=>pad.l+(datosMeses.length<=1?plotW/2:indice*plotW/(datosMeses.length-1));
+  const puntos={};
+  ctx.clearRect(0,0,w,h);
+  ctx.font="11px Segoe UI, Arial";
+  ctx.textAlign="right";ctx.textBaseline="middle";
+  for(let i=0;i<=4;i++){
+    const valor=max*i/4,y=pad.t+plotH-(plotH*i/4);
+    ctx.strokeStyle="#e9edf3";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
+    ctx.fillStyle="#667085";ctx.fillText(Math.round(valor).toString(),pad.l-9,y);
+  }
+  datosMeses.forEach((mes,indice)=>{
+    ctx.fillStyle="#667085";ctx.textAlign="center";ctx.textBaseline="top";
+    ctx.fillText(mes.label,x(indice),pad.t+plotH+13);
+  });
+  visibles.forEach(clave=>{
+    const serie=SERIES[clave];
+    puntos[clave]=datosMeses.map((mes,indice)=>({x:x(indice),y:pad.t+plotH-(numero(mes[clave])/max)*plotH,value:numero(mes[clave]),month:mes.label}));
+    ctx.strokeStyle=serie.color;ctx.fillStyle=serie.color;ctx.lineWidth=2.5;
+    ctx.beginPath();
+    puntos[clave].forEach((punto,indice)=>{if(indice===0)ctx.moveTo(punto.x,punto.y);else ctx.lineTo(punto.x,punto.y);});
+    ctx.stroke();
+    puntos[clave].forEach(punto=>{ctx.beginPath();ctx.arc(punto.x,punto.y,3.5,0,Math.PI*2);ctx.fill();});
+  });
+  if(!visibles.length){ctx.fillStyle="#667085";ctx.textAlign="center";ctx.fillText("Selecciona al menos una categoría",w/2,h/2);}
+  geometriaGrafico={puntos,visibles};
+  ocultarTooltip();
+}
+
+function ocultarTooltip(){document.getElementById("chartTooltip").style.display="none";}
+
+function mostrarTooltip(event){
+  if(!geometriaGrafico||!geometriaGrafico.visibles.length)return;
+  const canvas=document.getElementById("chartMensual"),tooltip=document.getElementById("chartTooltip"),bounds=canvas.getBoundingClientRect();
+  const mx=event.clientX-bounds.left,my=event.clientY-bounds.top;
+  let mejor=null,distanciaMin=Infinity;
+  for(const clave of geometriaGrafico.visibles){
+    geometriaGrafico.puntos[clave].forEach((punto,indice)=>{
+      const distancia=Math.hypot(mx-punto.x,my-punto.y);
+      if(distancia<distanciaMin){distanciaMin=distancia;mejor={indice};}
+    });
+  }
+  if(!mejor||distanciaMin>18){ocultarTooltip();return;}
+  const mes=datosMeses[mejor.indice];
+  const lineas=geometriaGrafico.visibles.map(clave=>`<div class="tip-row"><span class="tip-dot" style="background:${SERIES[clave].color}"></span>${SERIES[clave].label}: <b>${formato(mes[clave])}</b></div>`).join("");
+  tooltip.innerHTML=`<strong>${mes.label}</strong>${lineas}`;
+  tooltip.style.display="block";
+  const wrap=document.getElementById("chartWrap");
+  tooltip.style.left=`${Math.max(8,Math.min(mx+14,wrap.clientWidth-tooltip.offsetWidth-8))}px`;
+  tooltip.style.top=`${Math.max(8,Math.min(my-12,wrap.clientHeight-tooltip.offsetHeight-8))}px`;
+}
+
+empresa.addEventListener("change",()=>{errorConsulta.textContent="";errorConsulta.hidden=true;estadoConsulta.textContent="";datosMeses=[];actualizarPantalla();cargarUsuarios();});
+anio.addEventListener("change",actualizarBoton);
+boton.addEventListener("click",cargarDatos);
+document.querySelectorAll("[data-series]").forEach(elemento=>elemento.addEventListener("change",dibujarGrafico));
+document.getElementById("chartMensual").addEventListener("mousemove",mostrarTooltip);
+document.getElementById("chartMensual").addEventListener("mouseleave",ocultarTooltip);
+document.getElementById("chartMensual").addEventListener("touchstart",ocultarTooltip,{passive:true});
+window.addEventListener("resize",()=>{if(datosMeses.length)dibujarGrafico();});
+</script>
+{% endblock %}

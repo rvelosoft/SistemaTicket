@@ -6,13 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<<<<<<< HEAD
     <title>{% block title %}Registro de Actividades{% endblock %}</title>
-=======
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sistema de Tickets</title>
->>>>>>> origin/deploy-sqlite
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style_oscuro.css') }}">
@@ -23,16 +17,6 @@
 <body>
 
 <div class="container {% block container_class %}{% endblock %}">
-<<<<<<< HEAD
-=======
-
-{% if current_user.is_authenticated %}
-<header class="usuario-actual">
-    <strong>{{ current_user.NombreCompleto or current_user.Usuario }}</strong>
-    <span>{{ current_user.empresa.NombreEmpresa if current_user.empresa else 'Sin empresa asignada' }}</span>
-</header>
-{% endif %}
->>>>>>> origin/deploy-sqlite
 
     {% if current_user.is_authenticated %}
 

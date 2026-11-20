@@ -1,14 +1,180 @@
+
 {% extends 'base.html' %}
+
+{% block title %}
+    {{ 'Editar perfil' if perfil.IdPerfil else 'Crear perfil' }} | Registro de Actividades
+{% endblock %}
+
+{% block container_class %}contenedor-mantenimientos{% endblock %}
+
 {% block content %}
-<h2>{{ 'Editar perfil' if perfil.IdPerfil else 'Crear perfil' }}</h2>
-{% if errores %}
-<div class="errores"><ul>{% for error in errores %}<li>{{ error }}</li>{% endfor %}</ul></div>
-{% endif %}
-<form method="post">
-    <label for="nombre">Nombre del perfil</label>
-    <input id="nombre" name="nombre" maxlength="100" required value="{{ nombre }}">
-    <label><input type="checkbox" name="es_administrador" {% if es_administrador %}checked{% endif %}> Puede administrar tablas y parámetros</label>
-    <button type="submit">Guardar perfil</button>
-</form>
-<a href="{{ url_for('maintenance.perfiles') }}">Volver a perfiles</a>
+<div class="usuarios-page perfiles-page">
+
+    <!-- Encabezado -->
+    <div class="usuarios-header">
+        <div>
+            <span class="usuarios-eyebrow">ADMINISTRACIÓN DEL SISTEMA</span>
+
+            <h2>
+                {{ 'Editar perfil' if perfil.IdPerfil else 'Crear perfil' }}
+            </h2>
+
+            <p>
+                Configura el nombre del perfil y sus privilegios de administración.
+            </p>
+        </div>
+
+        <div class="usuarios-actions">
+            <a class="usuarios-btn usuarios-btn-secondary"
+               href="{{ url_for('maintenance.perfiles') }}">
+                ← Volver a perfiles
+            </a>
+        </div>
+    </div>
+
+    <!-- Errores -->
+    {% if errores %}
+    <div class="usuarios-alert error">
+        <strong>Se encontraron errores en el formulario:</strong>
+
+        <ul>
+            {% for error in errores %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" class="usuario-form">
+
+        <!-- Información del perfil -->
+        <div class="usuario-form-card">
+
+            <div class="usuario-form-heading">
+                <div class="usuario-form-icon">♙</div>
+
+                <div>
+                    <h3>Información del perfil</h3>
+                    <p>Define la identificación del rol dentro del sistema.</p>
+                </div>
+            </div>
+
+            <div class="usuario-form-grid">
+
+                <div class="usuario-form-field usuario-field-full">
+                    <label for="nombre">
+                        Nombre del perfil <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="nombre"
+                        name="nombre"
+                        type="text"
+                        maxlength="100"
+                        required
+                        placeholder="Ej: Administrador, Supervisor, Operador"
+                        value="{{ nombre }}">
+
+                    <small>
+                        Ingresa un nombre descriptivo para identificar este perfil.
+                    </small>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Privilegios -->
+        <div class="usuario-form-card">
+
+            <div class="usuario-form-heading">
+                <div class="usuario-form-icon seguridad">♧</div>
+
+                <div>
+                    <h3>Permisos y privilegios</h3>
+                    <p>Define las capacidades administrativas asociadas al perfil.</p>
+                </div>
+            </div>
+
+            <div class="perfil-permisos-container">
+
+                <div class="perfil-permisos-info">
+                    <div class="perfil-permisos-icon">⚙</div>
+
+                    <div>
+                        <strong>Privilegios de administración</strong>
+                        <p>
+                            Permite administrar tablas y parámetros del sistema.
+                        </p>
+                    </div>
+                </div>
+
+                <label class="perfil-admin-switch">
+                    <input
+                        type="checkbox"
+                        id="es_administrador"
+                        name="es_administrador"
+                        {% if es_administrador %}checked{% endif %}>
+
+                    <span class="perfil-admin-slider"></span>
+                </label>
+
+                <span class="perfil-admin-label" id="perfilAdminLabel">
+                    {% if es_administrador %}
+                        Administrador
+                    {% else %}
+                        Usuario estándar
+                    {% endif %}
+                </span>
+
+            </div>
+
+            <div class="perfil-permisos-notice">
+                <span>ⓘ</span>
+                <p>
+                    Al habilitar esta opción, el perfil tendrá privilegios para
+                    administrar tablas y parámetros. Verifica que esta asignación
+                    corresponda al nivel de acceso requerido.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Acciones -->
+        <div class="usuario-form-actions">
+
+            <a class="usuarios-btn usuarios-btn-secondary"
+               href="{{ url_for('maintenance.perfiles') }}">
+                Cancelar
+            </a>
+
+            <button type="submit" class="usuarios-btn usuarios-btn-primary">
+                <span>✓</span>
+                Guardar perfil
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const administrador = document.getElementById("es_administrador");
+    const etiqueta = document.getElementById("perfilAdminLabel");
+
+    function actualizarEtiqueta() {
+        etiqueta.textContent = administrador.checked
+            ? "Administrador"
+            : "Usuario estándar";
+    }
+
+    administrador.addEventListener("change", actualizarEtiqueta);
+
+    actualizarEtiqueta();
+
+});
+</script>
+
 {% endblock %}

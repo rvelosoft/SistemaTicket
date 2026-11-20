@@ -3362,3 +3362,1654 @@ input[type="checkbox"] {
         flex-direction: column;
     }
 }
+
+/* =====================================================
+   GESTIÓN DE TICKETS - TABLERO KANBAN
+   Tema oscuro
+===================================================== */
+
+.kanban-page {
+    width: 100%;
+}
+
+/* RESUMEN SUPERIOR */
+
+.kanban-resumen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 1.2fr;
+    gap: 14px;
+    margin: 22px 0;
+}
+
+.kanban-resumen-item,
+.kanban-resumen-total {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 82px;
+    padding: 15px 18px;
+    border: 1px solid #344155;
+    border-radius: 9px;
+    background: linear-gradient(145deg, #202a3a, #19212e);
+}
+
+.kanban-resumen-item > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.kanban-resumen-item small,
+.kanban-resumen-total span {
+    color: #aab6ca;
+    font-size: 11px;
+}
+
+.kanban-resumen-item strong,
+.kanban-resumen-total strong {
+    color: #f3f6fc;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.kanban-resumen-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 9px;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.kanban-resumen-icon.abierto {
+    color: #9bd6ff;
+    background: #203d5b;
+}
+
+.kanban-resumen-icon.progreso {
+    color: #59d7f2;
+    background: #10536b;
+}
+
+.kanban-resumen-icon.cerrado {
+    color: #64e7a2;
+    background: #17472f;
+}
+
+.kanban-resumen-total {
+    justify-content: space-between;
+    background: linear-gradient(145deg, #17427b, #192f51);
+    border-color: #315d83;
+}
+
+/* TABLERO */
+
+.kanban {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 18px;
+    width: 100%;
+    margin-top: 22px;
+}
+
+/* COLUMNAS */
+
+.kanban-columna {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 300px;
+    padding: 13px;
+    border: 1px solid #344155;
+    border-radius: 11px;
+    background: rgba(21, 30, 44, .88);
+    transition: border-color .2s ease, background .2s ease;
+}
+
+.kanban-columna.arrastre-activo {
+    border-color: #1685ff;
+    background: #192b43;
+    box-shadow: 0 0 0 2px rgba(8, 117, 249, .12);
+}
+
+/* CABECERA DE COLUMNA */
+
+.kanban-columna-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 5px 3px 14px;
+    border-bottom: 1px solid #344155;
+}
+
+.kanban-titulo-columna {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.kanban-titulo-columna h3 {
+    margin: 0;
+    color: #f3f6fc;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.kanban-estado-icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.kanban-estado-icon.abierto {
+    color: #9bd6ff;
+    background: #203d5b;
+}
+
+.kanban-estado-icon.progreso {
+    color: #59d7f2;
+    background: #10536b;
+}
+
+.kanban-estado-icon.cerrado {
+    color: #64e7a2;
+    background: #17472f;
+}
+
+/* CONTADOR */
+
+.kanban-contador {
+    display: grid;
+    place-items: center;
+    min-width: 29px;
+    height: 27px;
+    padding: 0 8px;
+    border: 1px solid #465267;
+    border-radius: 7px;
+    background: #202a3a;
+    color: #dce5f2;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* TARJETAS */
+
+.kanban-tarjetas {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 180px;
+}
+
+.kanban-tarjeta {
+    position: relative;
+    padding: 15px;
+    border: 1px solid #465267;
+    border-left: 3px solid #1685ff;
+    border-radius: 9px;
+    background: linear-gradient(145deg, #202a3a, #19212e);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .15);
+    cursor: grab;
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        opacity .2s ease;
+}
+
+.kanban-abierto .kanban-tarjeta {
+    border-left-color: #59aaff;
+}
+
+.kanban-en-progreso .kanban-tarjeta {
+    border-left-color: #59d7f2;
+}
+
+.kanban-cerrado .kanban-tarjeta {
+    border-left-color: #64e7a2;
+}
+
+.kanban-tarjeta:hover {
+    transform: translateY(-2px);
+    border-color: #64758f;
+    box-shadow: 0 9px 22px rgba(0, 0, 0, .25);
+}
+
+.kanban-tarjeta:active {
+    cursor: grabbing;
+}
+
+.kanban-tarjeta.arrastrando {
+    opacity: .4;
+    transform: scale(.97);
+}
+
+.kanban-tarjeta.kanban-actualizado {
+    border-color: #64e7a2;
+    box-shadow: 0 0 0 2px rgba(100, 231, 162, .15);
+}
+
+/* IDENTIFICACIÓN */
+
+.kanban-tarjeta-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 11px;
+}
+
+.kanban-ticket-id {
+    padding: 5px 9px;
+    border: 1px solid #315d83;
+    border-radius: 5px;
+    background: #203d5b;
+    color: #9bd6ff;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.kanban-arrastrar {
+    color: #8293aa;
+    font-size: 21px;
+    cursor: grab;
+}
+
+/* TÍTULO Y DESCRIPCIÓN */
+
+.kanban-tarjeta-titulo {
+    margin-bottom: 7px;
+    color: #f3f6fc;
+    font-size: 13px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.kanban-tarjeta-titulo strong {
+    font-weight: 750;
+}
+
+.kanban-descripcion {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-bottom: 13px;
+    color: #aab6ca;
+    font-size: 11px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+/* DETALLES */
+
+.kanban-detalles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px 10px;
+    margin: 0;
+    padding-top: 12px;
+    border-top: 1px solid #344155;
+}
+
+.kanban-detalles div {
+    min-width: 0;
+}
+
+.kanban-detalles dt {
+    margin-bottom: 3px;
+    color: #8293aa;
+    font-size: 9px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+
+.kanban-detalles dd {
+    margin: 0;
+    color: #dce5f2;
+    font-size: 10px;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.kanban-detalles .kanban-cierre {
+    color: #64e7a2;
+}
+
+/* ZONA VACÍA */
+
+.kanban-vacio {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-height: 75px;
+    margin-top: 12px;
+    border: 1px dashed #526074;
+    border-radius: 8px;
+    color: #8293aa;
+    font-size: 10px;
+    text-align: center;
+}
+
+.kanban-columna.arrastre-activo .kanban-vacio {
+    display: flex;
+    border-color: #1685ff;
+    background: rgba(8, 117, 249, .07);
+    color: #9bd6ff;
+}
+
+/* ERRORES */
+
+.kanban-page .tickets-errors {
+    margin-bottom: 18px;
+    padding: 14px 17px;
+    border: 1px solid #78394e;
+    border-left: 4px solid #ff8297;
+    border-radius: 8px;
+    background: #382331;
+    color: #ff9bad;
+}
+
+.kanban-page .tickets-errors strong {
+    font-size: 12px;
+}
+
+.kanban-page .tickets-errors ul {
+    margin: 7px 0 0;
+    padding-left: 18px;
+    line-height: 1.8;
+    font-size: 11px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1050px) {
+
+    .kanban {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .kanban-columna:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .kanban-resumen {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+
+    .kanban {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .kanban-columna:last-child {
+        grid-column: auto;
+    }
+
+    .kanban-resumen {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+    }
+
+    .kanban-resumen-item,
+    .kanban-resumen-total {
+        min-height: 70px;
+        padding: 11px;
+    }
+
+    .kanban-resumen-icon {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
+        font-size: 17px;
+    }
+
+    .kanban-resumen-item strong,
+    .kanban-resumen-total strong {
+        font-size: 20px;
+    }
+
+    .kanban-page .tickets-header-actions {
+        width: 100%;
+    }
+
+    .kanban-page .tickets-header-actions a {
+        flex: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .kanban *,
+    .kanban *::before,
+    .kanban *::after {
+        transition: none !important;
+    }
+
+}
+
+/* =====================================================
+   FORMULARIO MANTENCIÓN DE USUARIOS
+===================================================== */
+
+.usuario-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.usuario-form-card {
+    padding: 22px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.usuario-form-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 23px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid var(--border);
+}
+
+.usuario-form-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: rgba(8, 117, 249, .15);
+    color: var(--blue-light);
+    font-size: 21px;
+}
+
+.usuario-form-icon.seguridad {
+    background: rgba(199, 154, 255, .13);
+    color: var(--purple);
+}
+
+.usuario-form-heading h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.usuario-form-heading p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.usuario-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 21px;
+}
+
+.usuario-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.usuario-field-full {
+    grid-column: 1 / -1;
+}
+
+.usuario-form-field label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.usuario-form-field .required {
+    color: var(--red);
+}
+
+.usuario-form-field input,
+.usuario-form-field select {
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    background: var(--panel-soft);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.usuario-form-field input::placeholder {
+    color: var(--muted);
+    opacity: .7;
+}
+
+.usuario-form-field input:focus,
+.usuario-form-field select:focus {
+    border-color: var(--blue-light);
+    box-shadow: 0 0 0 3px rgba(8, 117, 249, .13);
+}
+
+.usuario-form-field select:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.usuario-form-field select option {
+    background: var(--panel);
+    color: var(--text);
+}
+
+.usuario-form-field small {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* Estado activo */
+
+.usuario-active-control {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--panel-soft);
+}
+
+.usuario-active-control > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.usuario-active-control strong {
+    color: var(--text);
+    font-size: 13px;
+}
+
+.usuario-active-control > div span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.usuario-active-label {
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Switch */
+
+.usuario-switch {
+    position: relative;
+    display: inline-block;
+    width: 43px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.usuario-switch input {
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.usuario-switch-slider {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    background: var(--border);
+    border-radius: 20px;
+    transition: .25s;
+}
+
+.usuario-switch-slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: .25s;
+}
+
+.usuario-switch input:checked + .usuario-switch-slider {
+    background: var(--blue);
+}
+
+.usuario-switch input:checked + .usuario-switch-slider::before {
+    transform: translateX(19px);
+}
+
+.usuario-switch input:focus-visible + .usuario-switch-slider {
+    outline: 2px solid var(--blue-light);
+    outline-offset: 3px;
+}
+
+/* Acciones del formulario */
+
+.usuario-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 5px 0 12px;
+}
+
+.usuario-form-actions button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.usuario-form-actions .usuarios-btn {
+    min-width: 145px;
+}
+
+/* 2FA */
+
+.usuario-2fa-card {
+    margin-top: 12px;
+}
+
+.usuario-2fa-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 15px;
+    border-radius: 9px;
+    background: var(--panel-soft);
+    border: 1px solid var(--border);
+}
+
+.usuario-2fa-info {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.usuario-2fa-label {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.usuario-reset-2fa-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid rgba(255, 208, 91, .35);
+    border-radius: 8px;
+    background: rgba(255, 208, 91, .10);
+    color: var(--amber);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.usuario-reset-2fa-btn:hover {
+    background: var(--amber);
+    color: #202020;
+}
+
+.usuario-2fa-warning {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* Errores */
+
+.usuarios-alert ul {
+    margin: 9px 0 0;
+    padding-left: 20px;
+}
+
+.usuarios-alert li {
+    margin: 4px 0;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .usuario-form-card {
+        padding: 17px;
+    }
+
+    .usuario-form-grid {
+        grid-template-columns: 1fr;
+        gap: 17px;
+    }
+
+    .usuario-field-full,
+    .usuario-active-control {
+        grid-column: auto;
+    }
+
+    .usuario-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .usuario-form-actions .usuarios-btn {
+        width: 100%;
+    }
+
+    .usuario-2fa-content {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .usuario-reset-2fa-btn {
+        width: 100%;
+    }
+}
+
+/* =====================================================
+   MANTENCIÓN DE ROLES Y PERFILES
+===================================================== */
+
+.perfiles-page {
+    width: 100%;
+}
+
+/* Nombre del perfil */
+
+.perfiles-table {
+    min-width: 650px;
+}
+
+.perfil-identificador {
+    display: inline-flex;
+    align-items: center;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 750;
+}
+
+/* Indicadores de privilegios */
+
+.perfil-privilegio {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.perfil-privilegio > span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.perfil-privilegio.administrador {
+    color: var(--purple);
+    background: rgba(199, 154, 255, .12);
+    border: 1px solid rgba(199, 154, 255, .2);
+}
+
+.perfil-privilegio.estandar {
+    color: var(--cyan);
+    background: rgba(89, 215, 242, .10);
+    border: 1px solid rgba(89, 215, 242, .2);
+}
+
+/* Acciones */
+
+.perfiles-table .usuarios-row-actions {
+    justify-content: center;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .perfiles-page .usuarios-header {
+        align-items: flex-start;
+    }
+
+    .perfiles-page .usuarios-actions {
+        width: 100%;
+    }
+
+    .perfiles-table {
+        min-width: 600px;
+    }
+}
+
+/* =====================================================
+   FORMULARIO CREACIÓN Y EDICIÓN DE PERFILES
+===================================================== */
+
+.perfiles-page .usuario-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Contenedor de permisos */
+
+.perfil-permisos-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    background: var(--panel-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.perfil-permisos-info {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    flex: 1;
+    min-width: 0;
+}
+
+.perfil-permisos-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: rgba(199, 154, 255, .13);
+    color: var(--purple);
+    font-size: 21px;
+}
+
+.perfil-permisos-info strong {
+    display: block;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.perfil-permisos-info p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* Switch administrador */
+
+.perfil-admin-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 25px;
+    flex-shrink: 0;
+}
+
+.perfil-admin-switch input {
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.perfil-admin-slider {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    background: var(--border);
+    border-radius: 20px;
+    transition: .25s;
+}
+
+.perfil-admin-slider::before {
+    content: "";
+    position: absolute;
+    width: 19px;
+    height: 19px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: .25s;
+}
+
+.perfil-admin-switch input:checked + .perfil-admin-slider {
+    background: var(--blue);
+}
+
+.perfil-admin-switch input:checked + .perfil-admin-slider::before {
+    transform: translateX(21px);
+}
+
+.perfil-admin-switch input:focus-visible + .perfil-admin-slider {
+    outline: 2px solid var(--blue-light);
+    outline-offset: 3px;
+}
+
+/* Etiqueta de privilegio */
+
+.perfil-admin-label {
+    min-width: 125px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 750;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* Aviso */
+
+.perfil-permisos-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 15px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: rgba(255, 208, 91, .07);
+    border: 1px solid rgba(255, 208, 91, .18);
+}
+
+.perfil-permisos-notice > span {
+    color: var(--amber);
+    font-size: 15px;
+}
+
+.perfil-permisos-notice p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .perfil-permisos-container {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .perfil-permisos-info {
+        flex-basis: 100%;
+    }
+
+    .perfil-admin-label {
+        min-width: auto;
+        text-align: left;
+    }
+
+}
+
+/* =====================================================
+   MANTENCIÓN DE TIPOS DE TICKET
+===================================================== */
+
+.tipos-ticket-page {
+    width: 100%;
+}
+
+/* Identificación del tipo */
+
+.tipos-ticket-table {
+    min-width: 550px;
+}
+
+.tipo-ticket-identificador {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.tipo-ticket-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: rgba(89, 215, 242, .12);
+    color: var(--cyan);
+    font-size: 17px;
+}
+
+/* Acciones */
+
+.tipos-ticket-table .usuarios-row-actions {
+    justify-content: center;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .tipos-ticket-page .usuarios-header {
+        align-items: flex-start;
+    }
+
+    .tipos-ticket-page .usuarios-actions {
+        width: 100%;
+    }
+
+    .tipos-ticket-page .usuarios-actions .usuarios-btn {
+        flex: 1;
+    }
+
+    .tipos-ticket-table {
+        min-width: 500px;
+    }
+
+}
+
+/* =====================================================
+   FORMULARIO CREACIÓN Y EDICIÓN DE TIPOS DE TICKET
+===================================================== */
+
+.tipos-ticket-page .usuario-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.tipos-ticket-page .usuario-form-card {
+    padding: 22px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.tipos-ticket-page .usuario-form-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 23px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid var(--border);
+}
+
+.tipos-ticket-page .usuario-form-icon {
+    background: rgba(89, 215, 242, .12);
+    color: var(--cyan);
+}
+
+.tipos-ticket-page .usuario-form-heading h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.tipos-ticket-page .usuario-form-heading p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.tipos-ticket-page .usuario-form-field input {
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel-soft);
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.tipos-ticket-page .usuario-form-field input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(89, 215, 242, .12);
+}
+
+.tipos-ticket-page .usuario-form-field input::placeholder {
+    color: var(--muted);
+    opacity: .7;
+}
+
+.tipos-ticket-page .usuario-form-field label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tipos-ticket-page .usuario-form-field .required {
+    color: var(--red);
+}
+
+.tipos-ticket-page .usuario-form-field small {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.tipos-ticket-page .usuario-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 5px 0 12px;
+}
+
+.tipos-ticket-page .usuario-form-actions button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+@media (max-width: 768px) {
+    .tipos-ticket-page .usuario-form-card {
+        padding: 17px;
+    }
+
+    .tipos-ticket-page .usuario-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .tipos-ticket-page .usuario-form-actions .usuarios-btn {
+        width: 100%;
+    }
+}
+
+/* =====================================================
+   MANTENCIÓN DE EMPRESAS
+===================================================== */
+
+.empresas-page {
+    width: 100%;
+}
+
+.empresas-table {
+    min-width: 550px;
+}
+
+/* Identificación de empresa */
+
+.empresa-identificador {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.empresa-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: rgba(100, 231, 162, .12);
+    color: var(--green);
+    font-size: 17px;
+}
+
+/* Acciones */
+
+.empresas-table .usuarios-row-actions {
+    justify-content: center;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .empresas-page .usuarios-header {
+        align-items: flex-start;
+    }
+
+    .empresas-page .usuarios-actions {
+        width: 100%;
+    }
+
+    .empresas-page .usuarios-actions .usuarios-btn {
+        flex: 1;
+    }
+
+    .empresas-table {
+        min-width: 500px;
+    }
+
+}
+
+/* =====================================================
+   FORMULARIO CREACIÓN Y EDICIÓN DE EMPRESAS
+===================================================== */
+
+.empresas-page .usuario-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.empresas-page .usuario-form-card {
+    padding: 22px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.empresas-page .empresa-form-icon {
+    background: rgba(100, 231, 162, .12);
+    color: var(--green);
+}
+
+.empresas-page .usuario-form-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 23px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid var(--border);
+}
+
+.empresas-page .usuario-form-heading h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.empresas-page .usuario-form-heading p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.empresas-page .usuario-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.empresas-page .usuario-form-field label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.empresas-page .usuario-form-field .required {
+    color: var(--red);
+}
+
+.empresas-page .usuario-form-field input {
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel-soft);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.empresas-page .usuario-form-field input::placeholder {
+    color: var(--muted);
+    opacity: .7;
+}
+
+.empresas-page .usuario-form-field input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(100, 231, 162, .12);
+}
+
+.empresas-page .usuario-form-field small {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.empresas-page .usuario-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 5px 0 12px;
+}
+
+.empresas-page .usuario-form-actions button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .empresas-page .usuario-form-card {
+        padding: 17px;
+    }
+
+    .empresas-page .usuario-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .empresas-page .usuario-form-actions .usuarios-btn {
+        width: 100%;
+    }
+
+}
+
+/* =====================================================
+   MANTENCIÓN DE GRUPOS DE TRABAJO
+===================================================== */
+
+.grupos-page {
+    width: 100%;
+}
+
+.grupos-table {
+    min-width: 750px;
+}
+
+/* Identificación del grupo */
+
+.grupo-identificador {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.grupo-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: rgba(199, 154, 255, .12);
+    color: var(--purple);
+    font-size: 17px;
+}
+
+/* Empresas asociadas */
+
+.grupo-empresas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.grupo-empresa-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: rgba(89, 215, 242, .10);
+    border: 1px solid rgba(89, 215, 242, .18);
+    color: var(--cyan);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.grupo-sin-empresas {
+    color: var(--muted);
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* Acciones */
+
+.grupos-table .usuarios-row-actions {
+    justify-content: center;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .grupos-page .usuarios-header {
+        align-items: flex-start;
+    }
+
+    .grupos-page .usuarios-actions {
+        width: 100%;
+    }
+
+    .grupos-page .usuarios-actions .usuarios-btn {
+        flex: 1;
+    }
+
+    .grupos-table {
+        min-width: 650px;
+    }
+
+}
+
+/* =====================================================
+   FORMULARIO CREACIÓN Y EDICIÓN DE GRUPOS
+===================================================== */
+
+.grupos-page .usuario-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.grupos-page .grupo-form-icon {
+    background: rgba(199, 154, 255, .12);
+    color: var(--purple);
+}
+
+/* Fieldset de empresas */
+
+.grupo-empresas-fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel-soft);
+}
+
+.grupo-empresas-fieldset legend {
+    padding: 0 8px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 750;
+}
+
+/* Cuadrícula de empresas */
+
+.grupo-empresas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+/* Opción individual */
+
+.grupo-empresa-option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    min-height: 49px;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel);
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+}
+
+.grupo-empresa-option:hover {
+    border-color: var(--blue-light);
+    background: var(--panel-hover);
+}
+
+.grupo-empresa-option:has(input:checked) {
+    border-color: var(--blue-light);
+    background: rgba(8, 117, 249, .10);
+}
+
+.grupo-empresa-option input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Checkbox personalizado */
+
+.grupo-empresa-checkbox {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    height: 19px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--panel-soft);
+    transition: .2s;
+}
+
+.grupo-empresa-checkbox::after {
+    content: "✓";
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    opacity: 0;
+}
+
+.grupo-empresa-option input:checked + .grupo-empresa-checkbox {
+    background: var(--blue);
+    border-color: var(--blue);
+}
+
+.grupo-empresa-option input:checked + .grupo-empresa-checkbox::after {
+    opacity: 1;
+}
+
+.grupo-empresa-option input:focus-visible + .grupo-empresa-checkbox {
+    outline: 2px solid var(--blue-light);
+    outline-offset: 3px;
+}
+
+/* Nombre de empresa */
+
+.grupo-empresa-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 650;
+}
+
+/* Ayuda */
+
+.grupo-empresas-help {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 13px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.grupo-empresas-help span {
+    color: var(--cyan);
+    font-size: 14px;
+}
+
+/* Sin empresas */
+
+.grupo-empresas-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 15px;
+    text-align: center;
+}
+
+.grupo-empresas-empty > span {
+    margin-bottom: 10px;
+    color: var(--muted);
+    font-size: 27px;
+}
+
+.grupo-empresas-empty strong {
+    color: var(--text);
+    font-size: 13px;
+}
+
+.grupo-empresas-empty p {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .grupo-empresas-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .grupo-empresas-fieldset {
+        padding: 13px;
+    }
+
+    .grupos-page .usuario-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .grupos-page .usuario-form-actions .usuarios-btn {
+        width: 100%;
+    }
+
+}

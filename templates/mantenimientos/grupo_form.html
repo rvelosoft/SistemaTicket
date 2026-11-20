@@ -1,22 +1,163 @@
+
 {% extends 'base.html' %}
+
+{% block title %}
+    {{ 'Editar grupo de trabajo' if grupo.IdGrupo else 'Crear grupo de trabajo' }} | Registro de Actividades
+{% endblock %}
+
+{% block container_class %}contenedor-mantenimientos{% endblock %}
+
 {% block content %}
-<h2>{{ 'Editar grupo de trabajo' if grupo.IdGrupo else 'Crear grupo de trabajo' }}</h2>
-{% if errores %}
-<div class="errores"><ul>{% for error in errores %}<li>{{ error }}</li>{% endfor %}</ul></div>
-{% endif %}
-<form method="post">
-    <label for="nombre">Nombre del grupo</label>
-    <input id="nombre" name="nombre" maxlength="150" required value="{{ nombre }}">
-    <fieldset class="seleccion-empresas">
-        <legend>Empresas asociadas</legend>
-        {% for empresa in empresas %}
-        <label>
-            <input type="checkbox" name="empresa_ids" value="{{ empresa.IdEmpresa }}" {% if empresa.IdEmpresa|string in empresa_ids %}checked{% endif %}>
-            {{ empresa.NombreEmpresa }}
-        </label>
-        {% endfor %}
-    </fieldset>
-    <button type="submit">Guardar grupo</button>
-</form>
-<a href="{{ url_for('maintenance.grupos') }}">Volver a grupos</a>
+<div class="usuarios-page grupos-page">
+
+    <!-- Encabezado -->
+    <div class="usuarios-header">
+        <div>
+            <span class="usuarios-eyebrow">ADMINISTRACIÓN DEL SISTEMA</span>
+
+            <h2>
+                {{ 'Editar grupo de trabajo' if grupo.IdGrupo else 'Crear grupo de trabajo' }}
+            </h2>
+
+            <p>
+                Configura el grupo y las empresas que estarán asociadas.
+            </p>
+        </div>
+
+        <div class="usuarios-actions">
+            <a class="usuarios-btn usuarios-btn-secondary"
+               href="{{ url_for('maintenance.grupos') }}">
+                ← Volver a grupos
+            </a>
+        </div>
+    </div>
+
+    <!-- Errores -->
+    {% if errores %}
+    <div class="usuarios-alert error">
+        <strong>Se encontraron errores en el formulario:</strong>
+
+        <ul>
+            {% for error in errores %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" class="usuario-form">
+
+        <!-- Información del grupo -->
+        <div class="usuario-form-card">
+
+            <div class="usuario-form-heading">
+                <div class="usuario-form-icon grupo-form-icon">▥</div>
+
+                <div>
+                    <h3>Información del grupo</h3>
+                    <p>Define la identificación del grupo de trabajo.</p>
+                </div>
+            </div>
+
+            <div class="usuario-form-grid">
+
+                <div class="usuario-form-field usuario-field-full">
+                    <label for="nombre">
+                        Nombre del grupo <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="nombre"
+                        name="nombre"
+                        type="text"
+                        maxlength="150"
+                        required
+                        placeholder="Ej: Infraestructura, Desarrollo, Soporte"
+                        value="{{ nombre }}">
+
+                    <small>
+                        Ingresa un nombre descriptivo para identificar el grupo.
+                    </small>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Empresas asociadas -->
+        <div class="usuario-form-card">
+
+            <div class="usuario-form-heading">
+                <div class="usuario-form-icon grupo-form-icon">▦</div>
+
+                <div>
+                    <h3>Empresas asociadas</h3>
+                    <p>Selecciona una o más empresas que pertenecerán al grupo.</p>
+                </div>
+            </div>
+
+            <fieldset class="grupo-empresas-fieldset">
+
+                <legend>Seleccionar empresas</legend>
+
+                {% if empresas %}
+
+                    <div class="grupo-empresas-grid">
+
+                        {% for empresa in empresas %}
+                        <label class="grupo-empresa-option">
+
+                            <input
+                                type="checkbox"
+                                name="empresa_ids"
+                                value="{{ empresa.IdEmpresa }}"
+                                {% if empresa.IdEmpresa|string in empresa_ids %}checked{% endif %}>
+
+                            <span class="grupo-empresa-checkbox"></span>
+
+                            <span class="grupo-empresa-name">
+                                {{ empresa.NombreEmpresa }}
+                            </span>
+
+                        </label>
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="grupo-empresas-empty">
+                        <span>▦</span>
+                        <strong>No hay empresas disponibles</strong>
+                        <p>Debes registrar empresas antes de asociarlas a un grupo.</p>
+                    </div>
+
+                {% endif %}
+
+            </fieldset>
+
+            <div class="grupo-empresas-help">
+                <span>ⓘ</span>
+                Puedes asociar varias empresas al mismo grupo de trabajo.
+            </div>
+
+        </div>
+
+        <!-- Acciones -->
+        <div class="usuario-form-actions">
+
+            <a class="usuarios-btn usuarios-btn-secondary"
+               href="{{ url_for('maintenance.grupos') }}">
+                Cancelar
+            </a>
+
+            <button type="submit" class="usuarios-btn usuarios-btn-primary">
+                <span>✓</span>
+                Guardar grupo
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
 {% endblock %}

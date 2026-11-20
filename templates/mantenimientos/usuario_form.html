@@ -1,91 +1,410 @@
+
 {% extends 'base.html' %}
+
+{% block title %}
+    {{ 'Editar usuario' if usuario.IdUsuario else 'Crear usuario' }} | Registro de Actividades
+{% endblock %}
+
+{% block container_class %}contenedor-mantenimientos{% endblock %}
+
 {% block content %}
-<h2>{{ 'Editar usuario' if usuario.IdUsuario else 'Crear usuario' }}</h2>
-{% if errores %}
-<div class="errores"><ul>{% for error in errores %}<li>{{ error }}</li>{% endfor %}</ul></div>
-{% endif %}
-<form method="post">
-    <label for="usuario">Usuario</label>
-    <input id="usuario" name="usuario" maxlength="100" required value="{{ valores.usuario }}">
-    <label for="nombre">Nombre completo</label>
-    <input id="nombre" name="nombre" maxlength="200" required value="{{ valores.nombre }}">
-    <label for="correo">Correo</label>
-    <input id="correo" name="correo" type="email" maxlength="200" required value="{{ valores.correo }}">
-    <label for="perfil_id">Perfil o rol</label>
-    <select id="perfil_id" name="perfil_id" required>
-        <option value="">Selecciona un perfil</option>
-        {% for perfil in perfiles %}
-        <option value="{{ perfil.IdPerfil }}" {% if valores.perfil_id == perfil.IdPerfil|string %}selected{% endif %}>{{ perfil.NombrePerfil }}</option>
-        {% endfor %}
-    </select>
-    <label for="empresa_id">Empresa asignada</label>
-    <select id="empresa_id" name="empresa_id" required>
-        <option value="">Selecciona una empresa</option>
-        {% for empresa in empresas %}
-        <option value="{{ empresa.IdEmpresa }}" {% if valores.empresa_id == empresa.IdEmpresa|string %}selected{% endif %}>{{ empresa.NombreEmpresa }}</option>
-        {% endfor %}
-    </select>
-    <label for="grupo_id">Grupo de trabajo</label>
-    <select id="grupo_id" name="grupo_id" required
-        data-url-template="{{ url_for('maintenance.grupos_por_empresa', empresa_id=0) }}"
-        data-grupo-seleccionado="{{ valores.grupo_id }}"
-        {% if not valores.empresa_id %}disabled{% endif %}>
-        <option value="">Selecciona primero una empresa</option>
-    </select>
-    <label for="password">{{ 'Contraseña (dejar vacía para conservarla)' if usuario.IdUsuario else 'Contraseña (mínimo 8 caracteres)' }}</label>
-    <input id="password" name="password" type="password" minlength="8" {% if not usuario.IdUsuario %}required{% endif %} autocomplete="new-password">
-    <label><input type="checkbox" name="activo" {% if valores.activo %}checked{% endif %}> Usuario activo</label>
-    <button type="submit">Guardar usuario</button>
-</form>
-{% if usuario.IdUsuario %}
-<p>Verificación 2FA inicial: <strong>{{ 'Verificado' if usuario.totp_verificado else 'Pendiente' }}</strong></p>
-<form method="post" action="{{ url_for('maintenance.resetear_2fa', user_id=usuario.IdUsuario) }}">
-    <button type="submit" onclick="return confirm('¿Resetear la verificación 2FA de este usuario?');">Resetear 2FA</button>
-</form>
-{% endif %}
-<a href="{{ url_for('maintenance.usuarios') }}">Volver a usuarios</a>
+<div class="usuarios-page">
+
+    <!-- Encabezado -->
+    <div class="usuarios-header">
+        <div>
+            <span class="usuarios-eyebrow">ADMINISTRACIÓN DEL SISTEMA</span>
+
+            <h2>
+                {{ 'Editar usuario' if usuario.IdUsuario else 'Crear usuario' }}
+            </h2>
+
+            <p>
+                Administra los datos de acceso, perfil, empresa y grupo de trabajo.
+            </p>
+        </div>
+
+        <div class="usuarios-actions">
+            <a class="usuarios-btn usuarios-btn-secondary"
+               href="{{ url_for('maintenance.usuarios') }}">
+                ← Volver a usuarios
+            </a>
+        </div>
+    </div>
+
+    <!-- Errores de validación -->
+    {% if errores %}
+    <div class="usuarios-alert error">
+        <strong>Se encontraron errores en el formulario:</strong>
+        <ul>
+            {% for error in errores %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" class="usuario-form">
+
+        <!-- Datos generales -->
+        <div class="usuario-form-card">
+
+            <div class="usuario-form-heading">
+                <div class="usuario-form-icon">♙</div>
+
+                <div>
+                    <h3>Información del usuario</h3>
+                    <p>Datos personales y credenciales de identificación.</p>
+                </div>
+            </div>
+
+            <div class="usuario-form-grid">
+
+                <div class="usuario-form-field">
+                    <label for="usuario">
+                        Nombre de usuario <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="usuario"
+                        name="usuario"
+                        type="text"
+                        maxlength="100"
+                        required
+                        autocomplete="username"
+                        placeholder="Ej: jperez"
+                        value="{{ valores.usuario }}">
+                </div>
+
+                <div class="usuario-form-field">
+                    <label for="nombre">
+                        Nombre completo <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="nombre"
+                        name="nombre"
+                        type="text"
+                        maxlength="200"
+                        required
+                        placeholder="Nombre y apellidos"
+                        value="{{ valores.nombre }}">
+                </div>
+
+                <div class="usuario-form-field usuario-field-full">
+                    <label for="correo">
+                        Correo electrónico <span class="required">*</span>
+                    </label>
+
+                    <input
+                        id="correo"
+                        name="correo"
+                        type="email"
+                        maxlength="200"
+                        required
+                        autocomplete="email"
+                        placeholder="usuario@empresa.cl"
+                        value="{{ valores.correo }}">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Asignaciones -->
+        <div class="usuario-form-card">
+
+            <div class="usuario-form-heading">
+                <div class="usuario-form-icon">▤</div>
+
+                <div>
+                    <h3>Asignación organizacional</h3>
+                    <p>Define el perfil de acceso y la estructura a la que pertenece.</p>
+                </div>
+            </div>
+
+            <div class="usuario-form-grid">
+
+                <div class="usuario-form-field">
+                    <label for="perfil_id">
+                        Perfil o rol <span class="required">*</span>
+                    </label>
+
+                    <select id="perfil_id" name="perfil_id" required>
+                        <option value="">Selecciona un perfil</option>
+
+                        {% for perfil in perfiles %}
+                        <option
+                            value="{{ perfil.IdPerfil }}"
+                            {% if valores.perfil_id == perfil.IdPerfil|string %}selected{% endif %}>
+                            {{ perfil.NombrePerfil }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <small>Determina los permisos y funcionalidades disponibles.</small>
+                </div>
+
+                <div class="usuario-form-field">
+                    <label for="empresa_id">
+                        Empresa asignada <span class="required">*</span>
+                    </label>
+
+                    <select id="empresa_id" name="empresa_id" required>
+                        <option value="">Selecciona una empresa</option>
+
+                        {% for empresa in empresas %}
+                        <option
+                            value="{{ empresa.IdEmpresa }}"
+                            {% if valores.empresa_id == empresa.IdEmpresa|string %}selected{% endif %}>
+                            {{ empresa.NombreEmpresa }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <small>Empresa a la que estará asociado el usuario.</small>
+                </div>
+
+                <div class="usuario-form-field usuario-field-full">
+                    <label for="grupo_id">
+                        Grupo de trabajo <span class="required">*</span>
+                    </label>
+
+                    <select
+                        id="grupo_id"
+                        name="grupo_id"
+                        required
+                        data-url-template="{{ url_for('maintenance.grupos_por_empresa', empresa_id=0) }}"
+                        data-grupo-seleccionado="{{ valores.grupo_id }}"
+                        {% if not valores.empresa_id %}disabled{% endif %}>
+
+                        <option value="">Selecciona primero una empresa</option>
+                    </select>
+
+                    <small>Los grupos disponibles dependen de la empresa seleccionada.</small>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Seguridad -->
+        <div class="usuario-form-card">
+
+            <div class="usuario-form-heading">
+                <div class="usuario-form-icon seguridad">♧</div>
+
+                <div>
+                    <h3>Seguridad y acceso</h3>
+                    <p>Configuración de contraseña y estado de la cuenta.</p>
+                </div>
+            </div>
+
+            <div class="usuario-form-grid">
+
+                <div class="usuario-form-field usuario-field-full">
+                    <label for="password">
+                        {{ 'Contraseña (dejar vacía para conservarla)' if usuario.IdUsuario else 'Contraseña (mínimo 8 caracteres)' }}
+                        {% if not usuario.IdUsuario %}
+                            <span class="required">*</span>
+                        {% endif %}
+                    </label>
+
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        minlength="8"
+                        {% if not usuario.IdUsuario %}required{% endif %}
+                        autocomplete="new-password"
+                        placeholder="{{ 'Ingresa una nueva contraseña solo si deseas cambiarla' if usuario.IdUsuario else 'Ingresa una contraseña segura' }}">
+
+                    <small>
+                        {% if usuario.IdUsuario %}
+                            Si no ingresas una contraseña, se conservará la actual.
+                        {% else %}
+                            La contraseña debe tener al menos 8 caracteres.
+                        {% endif %}
+                    </small>
+                </div>
+
+                <div class="usuario-active-control">
+                    <div>
+                        <strong>Estado de la cuenta</strong>
+                        <span>Permite o restringe el acceso del usuario al sistema.</span>
+                    </div>
+
+                    <label class="usuario-switch">
+                        <input
+                            type="checkbox"
+                            name="activo"
+                            {% if valores.activo %}checked{% endif %}>
+
+                        <span class="usuario-switch-slider"></span>
+                    </label>
+
+                    <span class="usuario-active-label">
+                        Usuario activo
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="usuario-form-actions">
+            <a class="usuarios-btn usuarios-btn-secondary"
+               href="{{ url_for('maintenance.usuarios') }}">
+                Cancelar
+            </a>
+
+            <button type="submit" class="usuarios-btn usuarios-btn-primary">
+                <span>✓</span>
+                Guardar usuario
+            </button>
+        </div>
+
+    </form>
+
+    <!-- Configuración 2FA: solo edición -->
+    {% if usuario.IdUsuario %}
+
+    <div class="usuario-form-card usuario-2fa-card">
+
+        <div class="usuario-form-heading">
+            <div class="usuario-form-icon seguridad">⌑</div>
+
+            <div>
+                <h3>Autenticación de dos factores (2FA)</h3>
+                <p>Estado de la verificación inicial del usuario.</p>
+            </div>
+        </div>
+
+        <div class="usuario-2fa-content">
+
+            <div class="usuario-2fa-info">
+                <span class="usuario-2fa-label">Estado de verificación</span>
+
+                {% if usuario.totp_verificado %}
+                    <span class="usuario-status activo">
+                        <span></span> Verificado
+                    </span>
+                {% else %}
+                    <span class="usuario-status pendiente">
+                        <span></span> Pendiente
+                    </span>
+                {% endif %}
+            </div>
+
+            <form method="post"
+                  action="{{ url_for('maintenance.resetear_2fa', user_id=usuario.IdUsuario) }}"
+                  onsubmit="return confirm('¿Resetear la verificación 2FA de este usuario?');">
+
+                <button type="submit" class="usuario-reset-2fa-btn">
+                    ↻ Resetear 2FA
+                </button>
+
+            </form>
+
+        </div>
+
+        <p class="usuario-2fa-warning">
+            Al resetear la verificación, el usuario deberá configurar nuevamente
+            su autenticación de dos factores.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!-- Carga dinámica de grupos por empresa -->
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+
     const empresaSelect = document.getElementById("empresa_id");
     const grupoSelect = document.getElementById("grupo_id");
 
     async function cargarGrupos() {
+
         const empresaId = empresaSelect.value;
         const grupoSeleccionado = grupoSelect.dataset.grupoSeleccionado;
-        grupoSelect.replaceChildren(new Option(
-            empresaId ? "Cargando grupos..." : "Selecciona primero una empresa",
-            ""
-        ));
+
+        grupoSelect.replaceChildren(
+            new Option(
+                empresaId
+                    ? "Cargando grupos..."
+                    : "Selecciona primero una empresa",
+                ""
+            )
+        );
+
         grupoSelect.disabled = !empresaId;
+
         if (!empresaId) return;
 
         const url = grupoSelect.dataset.urlTemplate.replace(
             "/0/",
             `/${empresaId}/`
         );
-        const respuesta = await fetch(url);
-        if (!respuesta.ok) {
-            grupoSelect.replaceChildren(new Option("No se pudieron cargar los grupos", ""));
-            return;
-        }
 
-        const grupos = await respuesta.json();
-        grupoSelect.replaceChildren(new Option(
-            grupos.length ? "Selecciona un grupo" : "La empresa no tiene grupos",
-            ""
-        ));
-        for (const grupo of grupos) {
-            const opcion = new Option(grupo.nombre, grupo.id);
-            opcion.selected = String(grupo.id) === grupoSeleccionado;
-            grupoSelect.add(opcion);
+        try {
+
+            const respuesta = await fetch(url);
+
+            if (!respuesta.ok) {
+                grupoSelect.replaceChildren(
+                    new Option("No se pudieron cargar los grupos", "")
+                );
+                return;
+            }
+
+            const grupos = await respuesta.json();
+
+            grupoSelect.replaceChildren(
+                new Option(
+                    grupos.length
+                        ? "Selecciona un grupo"
+                        : "La empresa no tiene grupos",
+                    ""
+                )
+            );
+
+            for (const grupo of grupos) {
+
+                const opcion = new Option(grupo.nombre, grupo.id);
+
+                opcion.selected =
+                    String(grupo.id) === String(grupoSeleccionado);
+
+                grupoSelect.add(opcion);
+            }
+
+            grupoSelect.disabled = grupos.length === 0;
+
+            grupoSelect.dataset.grupoSeleccionado = "";
+
+        } catch (error) {
+
+            console.error("Error al cargar grupos:", error);
+
+            grupoSelect.replaceChildren(
+                new Option("Error al cargar los grupos", "")
+            );
+
+            grupoSelect.disabled = true;
         }
-        grupoSelect.disabled = grupos.length === 0;
-        grupoSelect.dataset.grupoSeleccionado = "";
     }
 
-    empresaSelect.addEventListener("change", () => {
+    empresaSelect.addEventListener("change", function () {
+
         grupoSelect.dataset.grupoSeleccionado = "";
+
         cargarGrupos();
     });
+
     cargarGrupos();
+
+});
 </script>
+
 {% endblock %}

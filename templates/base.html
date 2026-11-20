@@ -3,15 +3,17 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{% block title %}Registro de Actividades{% endblock %}</title>
+    <title>{% block title %}Sistema de Tickets{% endblock %}</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style_oscuro.css') }}">
 
     {% block extra_head %}{% endblock %}
+
 </head>
 
 <body>
@@ -22,7 +24,6 @@
 
     <!-- =====================================
          NAVEGACIÓN GLOBAL
-         Se muestra en todas las páginas
     ====================================== -->
 
     <header class="internal-topbar">
@@ -33,6 +34,7 @@
             {% if es_administrador is defined and not es_administrador %}
 
             <a href="/ticket/nuevo" class="internal-option">
+
                 <span class="internal-option-icon blue">＋</span>
 
                 <span class="internal-option-text">
@@ -41,6 +43,7 @@
                 </span>
 
                 <span class="option-arrow">→</span>
+
             </a>
 
             {% endif %}
@@ -57,6 +60,7 @@
                 </span>
 
                 <span class="option-arrow">→</span>
+
             </a>
 
 
@@ -73,6 +77,7 @@
                 </span>
 
                 <span class="option-arrow">→</span>
+
             </a>
 
             {% endif %}
@@ -80,11 +85,12 @@
         </nav>
 
 
-        <!-- SEPARADOR DEL PERFIL -->
+        <!-- =====================================
+             PERFIL DEL USUARIO
+        ====================================== -->
+
         <div class="profile-divider"></div>
 
-
-        <!-- PERFIL Y CIERRE DE SESIÓN -->
         <div class="user-profile">
 
             <div class="profile-avatar">
@@ -129,6 +135,9 @@
     </main>
 
 </div>
+
+
+<!-- SCRIPTS ESPECÍFICOS DE CADA PÁGINA -->
 
 {% block extra_scripts %}{% endblock %}
 

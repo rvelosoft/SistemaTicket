@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ 'Editar perfil' if perfil.IdPerfil else 'Crear perfil' }}</h2>
+{% if errores %}
+<div class="errores"><ul>{% for error in errores %}<li>{{ error }}</li>{% endfor %}</ul></div>
+{% endif %}
+<form method="post">
+    <label for="nombre">Nombre del perfil</label>
+    <input id="nombre" name="nombre" maxlength="100" required value="{{ nombre }}">
+    <label><input type="checkbox" name="es_administrador" {% if es_administrador %}checked{% endif %}> Puede administrar tablas y parámetros</label>
+    <button type="submit">Guardar perfil</button>
+</form>
+<a href="{{ url_for('maintenance.perfiles') }}">Volver a perfiles</a>
+{% endblock %}

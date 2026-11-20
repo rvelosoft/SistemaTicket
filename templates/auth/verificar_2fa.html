@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Verificación inicial 2FA</h2>
+<p>Escanea este código QR con Google Authenticator o Microsoft Authenticator.</p>
+<div class="verificacion-2fa-qr">
+    <img src="{{ qr_data_uri }}" alt="Código QR para configurar la autenticación de doble factor">
+</div>
+<p>Si no puedes escanearlo, ingresa manualmente esta clave:</p>
+<p class="verificacion-2fa-secreto"><code>{{ usuario.totp_secret }}</code></p>
+
+{% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, mensaje in mensajes %}
+        <p class="{{ categoria }}">{{ mensaje }}</p>
+    {% endfor %}
+{% endwith %}
+
+<form method="post">
+    <label for="codigo">Código de 6 dígitos</label>
+    <input id="codigo" name="codigo" type="text" inputmode="numeric"
+        pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code">
+    <button type="submit">Verificar y continuar</button>
+</form>
+{% endblock %}

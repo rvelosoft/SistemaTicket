@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestión de tareas</title>
+  <link rel="stylesheet" href="../static/style_oscuro.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#">
+        <span class="brand-mark">✓</span>
+        <span>Gestión de tareas</span>
+      </a>
+
+      <div class="nav-heading">OPERACIÓN</div>
+      <nav class="nav">
+        <a class="nav-item active" href="#"><span class="nav-icon">♙</span>Mis tareas</a>
+        <a class="nav-item" href="#"><span class="nav-icon">▱</span>Bandeja</a>
+        <a class="nav-item" href="#"><span class="nav-icon">▦</span>Tablero</a>
+        <a class="nav-item" href="#"><span class="nav-icon">▣</span>Calendario</a>
+        <a class="nav-item" href="#"><span class="nav-icon">▥</span>Reportes</a>
+        <a class="nav-item" href="#"><span class="nav-icon">♧</span>Equipos</a>
+      </nav>
+
+      <div class="nav-divider"></div>
+      <div class="nav-heading">CONFIGURACIÓN</div>
+      <nav class="nav">
+        <a class="nav-item" href="#"><span class="nav-icon">⚙</span>Usuarios y roles</a>
+        <a class="nav-item" href="#"><span class="nav-icon">◇</span>Categorías</a>
+        <a class="nav-item" href="#"><span class="nav-icon">♧</span>Notificaciones</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="page-header">
+        <div>
+          <h1>Gestión de tareas</h1>
+          <p>Seguimiento y control de tareas del equipo</p>
+        </div>
+      </header>
+
+      <section class="filters">
+        <strong>Período</strong>
+        <select aria-label="Tipo de período"><option>Rango de fechas</option><option>Esta semana</option><option>Este mes</option></select>
+        <label class="date-field">▣ <input type="date" value="2026-11-01" aria-label="Fecha inicial"></label>
+        <span class="to-label">al</span>
+        <label class="date-field">▣ <input type="date" value="2026-11-17" aria-label="Fecha final"></label>
+        <button class="primary-button">▽ Aplicar filtro</button>
+      </section>
+
+      <section class="metrics" aria-label="Indicadores de tareas">
+        <article class="metric"><span class="metric-icon blue">☑</span><div><span class="metric-label">Tareas totales</span><strong>1.044</strong><small>Total del período</small></div></article>
+        <article class="metric"><span class="metric-icon green">◷</span><div><span class="metric-label">Pendientes</span><strong>91</strong><small>Por iniciar o en espera</small></div></article>
+        <article class="metric"><span class="metric-icon cyan">▷</span><div><span class="metric-label">En progreso</span><strong>24</strong><small>En ejecución</small></div></article>
+        <article class="metric"><span class="metric-icon purple">✓</span><div><span class="metric-label">Completadas</span><strong>953</strong><small>Finalizadas</small></div></article>
+        <article class="metric"><span class="metric-icon red">!</span><div><span class="metric-label">Vencidas</span><strong>4</strong><small>Fuera de plazo</small></div></article>
+        <article class="metric"><span class="metric-icon amber">♙</span><div><span class="metric-label">Sin asignar</span><strong>1</strong><small>Pendiente de asignación</small></div></article>
+      </section>
+
+      <section class="tabs" aria-label="Filtrar por estado">
+        <button class="tab selected">Todas (1.044)</button>
+        <button class="tab">Pendientes (91)</button>
+        <button class="tab">En progreso (24)</button>
+        <button class="tab">Completadas (953)</button>
+        <button class="tab">Vencidas (4)</button>
+        <button class="tab">Sin asignar (1)</button>
+      </section>
+
+      <label class="search-box"><span>⌕</span><input type="search" placeholder="Buscar tarea, responsable o proyecto..."></label>
+
+      <section class="table-wrap">
+        <table>
+          <thead><tr><th class="check-cell"><input type="checkbox" aria-label="Seleccionar todas"></th><th>Tarea</th><th>Responsable</th><th>Fecha límite</th><th>Prioridad</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" aria-label="Seleccionar tarea"></td>
+              <td><b>Revisar respaldos de infraestructura</b><small>Proyecto: Operación TI</small></td>
+              <td>Camila Rojas</td>
+              <td>▣ &nbsp;19-11-2026<small>(en 2 días)</small></td>
+              <td><span class="pill priority-high">⌃ Alta</span></td>
+              <td><span class="pill status-progress">▷ En progreso</span></td>
+              <td class="more">⋮</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Seleccionar tarea"></td>
+              <td><b>Actualizar inventario de activos TI</b><small>Proyecto: Gestión de Activos</small></td>
+              <td>Rodrigo Méndez</td>
+              <td>▣ &nbsp;24-11-2026<small>(en 7 días)</small></td>
+              <td><span class="pill priority-medium">＝ Media</span></td>
+              <td><span class="pill status-pending">◷ Pendiente</span></td>
+              <td class="more">⋮</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" aria-label="Seleccionar tarea"></td>
+              <td><b>Validar monitoreo de servicios</b><small>Proyecto: Continuidad Operacional</small></td>
+              <td>Felipe Araya</td>
+              <td>▣ &nbsp;17-11-2026<small class="overdue">(hoy)</small></td>
+              <td><span class="pill priority-low">⌄ Baja</span></td>
+              <td><span class="pill status-done">✓ Completada</span></td>
+              <td class="more">⋮</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

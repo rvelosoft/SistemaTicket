@@ -1,0 +1,638 @@
+<<<<<<< HEAD
+
+{% extends 'base.html' %}
+
+{% block title %}Tickets registrados | Registro de Actividades{% endblock %}
+
+{% block container_class %}contenedor-tickets{% endblock %}
+
+{% block content %}
+
+<div class="tickets-page">
+
+    <!-- ENCABEZADO -->
+    <header class="tickets-header">
+
+        <div>
+            <span class="ticket-eyebrow">REGISTRO DE ACTIVIDADES</span>
+            <h2>Tickets registrados</h2>
+            <p>Consulta, seguimiento y administración de tickets del sistema.</p>
+        </div>
+
+        <div class="tickets-header-actions">
+
+            <a class="tickets-action-secondary"
+               href="{{ url_for('home.menu') }}">
+                ← Volver al menú
+            </a>
+
+            {% if not current_user.EsAdministrador %}
+            <a class="tickets-action-primary"
+               href="{{ url_for('tickets.nuevo_ticket') }}">
+                <span>＋</span> Nuevo ticket
+            </a>
+            {% endif %}
+
+        </div>
+
+    </header>
+
+
+    <!-- ERRORES -->
+    {% if errores %}
+    <div class="tickets-errors" role="alert">
+        <strong>Se encontraron algunos problemas:</strong>
+        <ul>
+            {% for error in errores %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+
+    <!-- FILTROS -->
+    <section class="tickets-filter-card">
+
+        <div class="tickets-section-heading">
+            <div class="tickets-section-icon">⌕</div>
+            <div>
+                <h3>Filtros de búsqueda</h3>
+                <p>Utiliza los filtros para acotar los resultados.</p>
+            </div>
+        </div>
+
+        <form class="tickets-filter-form" method="get">
+
+            <div class="tickets-filter-grid">
+
+                <div class="tickets-field">
+                    <label for="fecha_desde">Fecha desde</label>
+                    <input
+                        id="fecha_desde"
+                        name="fecha_desde"
+                        type="date"
+                        value="{{ valores_filtro.fecha_desde }}">
+                </div>
+
+                <div class="tickets-field">
+                    <label for="fecha_hasta">Fecha hasta</label>
+                    <input
+                        id="fecha_hasta"
+                        name="fecha_hasta"
+                        type="date"
+                        value="{{ valores_filtro.fecha_hasta }}">
+                </div>
+
+                {% if current_user.EsAdministrador %}
+
+                <div class="tickets-field">
+                    <label for="empresa_id">Empresa</label>
+                    <select id="empresa_id" name="empresa_id">
+                        <option value="">Todas las empresas</option>
+                        {% for empresa in empresas %}
+                        <option
+                            value="{{ empresa.IdEmpresa }}"
+                            {% if valores_filtro.empresa_id == empresa.IdEmpresa|string %}selected{% endif %}>
+                            {{ empresa.NombreEmpresa }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="tickets-field">
+                    <label for="usuario_id">Usuario</label>
+                    <select id="usuario_id" name="usuario_id">
+                        <option value="">Todos los usuarios</option>
+                        {% for usuario in usuarios %}
+                        <option
+                            value="{{ usuario.IdUsuario }}"
+                            {% if valores_filtro.usuario_id == usuario.IdUsuario|string %}selected{% endif %}>
+                            {{ usuario.Usuario }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {% endif %}
+
+                <div class="tickets-field">
+                    <label for="estado">Estado</label>
+                    <select id="estado" name="estado">
+                        <option value="">Todos los estados</option>
+                        {% for estado in estados %}
+                        <option
+                            value="{{ estado }}"
+                            {% if valores_filtro.estado == estado %}selected{% endif %}>
+                            {{ estado }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="tickets-field">
+                    <label for="tipo_ticket_id">Tipo de ticket</label>
+                    <select id="tipo_ticket_id" name="tipo_ticket_id">
+                        <option value="">Todos los tipos</option>
+                        {% for tipo in tipos_ticket %}
+                        <option
+                            value="{{ tipo.IdTipoTicket }}"
+                            {% if valores_filtro.tipo_ticket_id == tipo.IdTipoTicket|string %}selected{% endif %}>
+                            {{ tipo.NombreTipo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="tickets-filter-actions">
+
+                <span class="tickets-filter-note">
+                    Puedes combinar varios criterios de búsqueda.
+                </span>
+
+                <div>
+                    <a class="tickets-clear-button"
+                       href="{{ url_for('tickets.listar_tickets') }}">
+                        Limpiar
+                    </a>
+
+                    <button type="submit" class="tickets-search-button">
+                        <span>⌕</span> Aplicar filtros
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- EXPORTACIÓN -->
+    {% if current_user.EsAdministrador and not errores %}
+
+    <div class="tickets-export-bar">
+
+        <div>
+            <strong>Exportar resultados</strong>
+            <small>Descarga la información según los filtros aplicados.</small>
+        </div>
+
+        <div class="tickets-export-actions">
+
+            <a href="{{ exportar_excel_url }}" class="export-excel">
+                <span>▦</span> Excel
+            </a>
+
+            <a href="{{ exportar_csv_url }}" class="export-csv">
+                <span>▤</span> CSV
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- RESULTADOS -->
+    <section class="tickets-results-card">
+
+        <div class="tickets-results-heading">
+
+            <div>
+                <h3>Listado de tickets</h3>
+                <p>Detalle de los registros encontrados.</p>
+            </div>
+
+            {% if paginacion %}
+            <span class="tickets-count">
+                {{ paginacion.total }} registros
+            </span>
+            {% elif tickets %}
+            <span class="tickets-count">
+                {{ tickets|length }} registros
+            </span>
+            {% endif %}
+
+        </div>
+
+
+        {% if tickets %}
+
+        <div class="tickets-table-wrapper">
+
+            <table class="tickets-data-table">
+
+                <thead>
+                    <tr>
+
+                        <th scope="col">N.º</th>
+
+                        {% if current_user.EsAdministrador %}
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Empresa</th>
+                        {% endif %}
+
+                        <th scope="col">Título</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Tipo</th>
+                        <th scope="col">Apertura</th>
+                        <th scope="col">Cierre</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Total HH</th>
+
+                        {% if not current_user.EsAdministrador %}
+                        <th scope="col">Acción</th>
+                        {% endif %}
+
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for ticket in tickets %}
+
+                    <tr>
+
+                        <td>
+                            <span class="ticket-number">
+                                #{{ ticket.IdTicket }}
+                            </span>
+                        </td>
+
+                        {% if current_user.EsAdministrador %}
+
+                        <td>
+                            {{ ticket.usuario_creacion.Usuario
+                               if ticket.usuario_creacion
+                               else 'Sin usuario' }}
+                        </td>
+
+                        <td>
+                            {{ ticket.usuario_creacion.empresa.NombreEmpresa
+                               if ticket.usuario_creacion and ticket.usuario_creacion.empresa
+                               else 'Sin empresa' }}
+                        </td>
+
+                        {% endif %}
+
+                        <td class="ticket-title-cell">
+                            <strong>{{ ticket.Titulo }}</strong>
+                        </td>
+
+                        <td class="ticket-description-cell">
+                            {{ ticket.Descripcion or 'Sin descripción' }}
+                        </td>
+
+                        <td>
+                            {{ ticket.tipo_ticket.NombreTipo
+                               if ticket.tipo_ticket
+                               else 'Sin tipo' }}
+                        </td>
+
+                        <td class="ticket-date-cell">
+                            {{ ticket.FechaApertura.strftime('%d/%m/%Y') }}
+                        </td>
+
+                        <td class="ticket-date-cell">
+                            {{ ticket.FechaCierre.strftime('%d/%m/%Y')
+                               if ticket.FechaCierre
+                               else 'Sin fecha' }}
+                        </td>
+
+                        <td>
+                            <span class="ticket-status
+                                {% if ticket.Estado == 'Abierto' %}status-open
+                                {% elif ticket.Estado == 'En Progreso' %}status-progress
+                                {% elif ticket.Estado == 'Cerrado' %}status-closed
+                                {% else %}status-default{% endif %}">
+
+                                <span class="status-dot"></span>
+                                {{ ticket.Estado }}
+
+                            </span>
+                        </td>
+
+                        <td>
+                            <strong>{{ ticket.TotalHH }}</strong>
+                        </td>
+
+                        {% if not current_user.EsAdministrador %}
+
+                        <td>
+                            {% if ticket.UsuarioCreacion == current_user.IdUsuario
+                                  and ticket.Estado in ('Abierto', 'En Progreso') %}
+
+                            <a class="ticket-edit-button"
+                               href="{{ url_for('tickets.editar_ticket', ticket_id=ticket.IdTicket) }}">
+                                ✎ Editar
+                            </a>
+
+                            {% else %}
+                            <span class="ticket-no-action">—</span>
+                            {% endif %}
+                        </td>
+
+                        {% endif %}
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <!-- SIN RESULTADOS -->
+        <div class="tickets-empty">
+
+            <div class="tickets-empty-icon">▤</div>
+
+            <h3>Aún no hay tickets</h3>
+
+            <p>
+                No se encontraron tickets para los criterios de búsqueda seleccionados.
+            </p>
+
+            {% if not current_user.EsAdministrador %}
+            <a href="{{ url_for('tickets.nuevo_ticket') }}"
+               class="tickets-action-primary">
+                ＋ Crear nuevo ticket
+            </a>
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- PAGINACIÓN -->
+    {% if paginacion and paginacion.total %}
+
+    <nav class="tickets-pagination" aria-label="Paginación de tickets">
+
+        <span class="pagination-summary">
+            Página {{ paginacion.page }} de {{ paginacion.pages }}
+            <span>·</span>
+            {{ paginacion.total }} tickets
+        </span>
+
+        <div class="pagination-links">
+
+            {% if paginacion.has_prev %}
+            <a href="{{ url_for('tickets.listar_tickets', page=paginacion.prev_num, **filtros_enlace) }}">
+                ← Anterior
+            </a>
+            {% endif %}
+
+            {% for numero in paginacion.iter_pages(
+                left_edge=1,
+                left_current=2,
+                right_current=2,
+                right_edge=1
+            ) %}
+
+                {% if numero %}
+
+                    {% if numero == paginacion.page %}
+                    <span class="pagination-current" aria-current="page">
+                        {{ numero }}
+                    </span>
+                    {% else %}
+                    <a href="{{ url_for('tickets.listar_tickets', page=numero, **filtros_enlace) }}">
+                        {{ numero }}
+                    </a>
+                    {% endif %}
+
+                {% else %}
+                <span class="pagination-separator">...</span>
+                {% endif %}
+
+            {% endfor %}
+
+            {% if paginacion.has_next %}
+            <a href="{{ url_for('tickets.listar_tickets', page=paginacion.next_num, **filtros_enlace) }}">
+                Siguiente →
+            </a>
+            {% endif %}
+
+        </div>
+
+    </nav>
+
+    {% endif %}
+
+</div>
+
+=======
+{% extends 'base.html' %}
+{% block container_class %}contenedor-tickets{% endblock %}
+{% block content %}
+
+<div class="encabezado-tickets">
+    <div>
+        <h2>Tickets registrados</h2>
+        <p>Por defecto se muestran los tickets de los últimos 30 días. Ajusta las fechas para consultar otro período.</p>
+    </div>
+    {% if current_user.EsUsuario %}
+    <div class="acciones-pagina">
+        <a class="boton-secundario" href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+        <a href="{{ url_for('tickets.gestion_tickets', **filtros_gestion) }}">Gestión de ticket</a>
+        <a href="{{ url_for('tickets.nuevo_ticket') }}">Nuevo ticket</a>
+    </div>
+    {% elif current_user.EsAdministrador %}
+    <div class="acciones-pagina">
+        <a class="boton-secundario" href="{{ url_for('home.menu') }}">Volver al menú</a>    
+        <a href="{{ url_for('tickets.gestion_tickets', **filtros_gestion) }}">Gestión de ticket</a>
+    </div>
+    {% else %}
+    <div class="acciones-pagina">
+        <a class="boton-secundario" href="{{ url_for('home.menu') }}">Volver al menú</a>
+        <a href="{{ url_for('tickets.gestion_tickets', **filtros_gestion) }}">Gestión de ticket</a>
+        <a href="{{ url_for('tickets.nuevo_ticket') }}">Nuevo ticket</a>
+    </div>
+    {% endif %}    
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="notificacion-exito" role="status">
+        {% for category, message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endwith %}
+
+{% if errores %}
+<div class="errores" role="alert">
+    <ul>
+        {% for error in errores %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form class="filtros-tickets" method="get">
+    <div class="campo-filtro">
+        <label for="fecha_desde">Fecha desde</label>
+        <input id="fecha_desde" name="fecha_desde" type="date" value="{{ valores_filtro.fecha_desde }}">
+    </div>
+    <div class="campo-filtro">
+        <label for="fecha_hasta">Fecha hasta</label>
+        <input id="fecha_hasta" name="fecha_hasta" type="date" value="{{ valores_filtro.fecha_hasta }}">
+    </div>
+    {% if current_user.EsAdministrador %}
+    <div class="campo-filtro">
+        <label for="empresa_id">Empresa</label>
+        <select id="empresa_id" name="empresa_id">
+            <option value="">Todas las empresas</option>
+            {% for empresa in empresas %}
+            <option value="{{ empresa.IdEmpresa }}" {% if valores_filtro.empresa_id == empresa.IdEmpresa|string %}selected{% endif %}>{{ empresa.NombreEmpresa }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="campo-filtro">
+        <label for="usuario_id">Usuario</label>
+        <select id="usuario_id" name="usuario_id">
+            <option value="">Todos los usuarios</option>
+            {% for usuario in usuarios %}
+            <option value="{{ usuario.IdUsuario }}" {% if valores_filtro.usuario_id == usuario.IdUsuario|string %}selected{% endif %}>{{ usuario.Usuario }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+    <div class="campo-filtro">
+        <label for="estado">Estado</label>
+        <select id="estado" name="estado">
+            <option value="">Todos los estados</option>
+            {% for estado in estados %}
+            <option value="{{ estado }}" {% if valores_filtro.estado == estado %}selected{% endif %}>{{ estado }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="campo-filtro">
+        <label for="tipo_ticket_id">Tipo</label>
+        <select id="tipo_ticket_id" name="tipo_ticket_id">
+            <option value="">Todos los tipos</option>
+            {% for tipo in tipos_ticket %}
+            <option value="{{ tipo.IdTipoTicket }}" {% if valores_filtro.tipo_ticket_id == tipo.IdTipoTicket|string %}selected{% endif %}>
+                {{ tipo.NombreTipo }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="acciones-filtros">
+        <button type="submit">Filtrar</button>
+        <a class="boton-secundario" href="{{ url_for('tickets.listar_tickets') }}">Limpiar</a>
+    </div>
+</form>
+
+{% if current_user.EsAdministrador and not errores %}
+<div class="acciones-exportacion">
+    <span>Exportar resultados:</span>
+    <a href="{{ exportar_excel_url }}">Excel</a>
+    <a href="{{ exportar_csv_url }}">CSV</a>
+</div>
+{% endif %}
+
+{% if tickets %}
+<div class="tabla-tickets-contenedor">
+    <table class="tabla-tickets">
+        <thead>
+            <tr>
+                <th scope="col">N.º</th>
+                {% if current_user.EsAdministrador %}
+                <th scope="col">Usuario</th>
+                <th scope="col">Empresa</th>
+                {% endif %}
+                <th scope="col">Título</th>
+                <th scope="col">Descripción</th>
+                <th scope="col">Tipo</th>
+                <th scope="col">Apertura</th>
+                <th scope="col">Cierre</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Total HH</th>
+                {% if not current_user.EsAdministrador %}
+                <th scope="col">Acción</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.IdTicket }}</td>
+                {% if current_user.EsAdministrador %}
+                <td>{{ ticket.usuario_creacion.Usuario if ticket.usuario_creacion else 'Sin usuario' }}</td>
+                <td>{{ ticket.usuario_creacion.empresa.NombreEmpresa if ticket.usuario_creacion and ticket.usuario_creacion.empresa else 'Sin empresa' }}</td>
+                {% endif %}
+                <td class="titulo-ticket">{{ ticket.Titulo }}</td>
+                <td class="descripcion-ticket">{{ ticket.Descripcion }}</td>
+                <td>{{ ticket.tipo_ticket.NombreTipo if ticket.tipo_ticket else 'Sin tipo' }}</td>
+                <td>{{ ticket.FechaApertura.strftime('%d/%m/%Y') }}</td>
+                <td>{{ ticket.FechaCierre.strftime('%d/%m/%Y') if ticket.FechaCierre else 'Sin fecha' }}</td>
+                <td>
+                    <span class="estado-ticket estado-{{ ticket.Estado|lower|replace(' ', '-') }}">
+                        {{ ticket.Estado }}
+                    </span>
+                </td>
+                <td>{{ ticket.TotalHH }}</td>
+                {% if not current_user.EsAdministrador %}
+                <td>
+                    {% if ticket.UsuarioCreacion == current_user.IdUsuario and ticket.Estado in ('Abierto', 'En Progreso') %}
+                    <a href="{{ url_for('tickets.editar_ticket', ticket_id=ticket.IdTicket) }}">Editar</a>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="sin-tickets">
+    <h3>Aún no hay tickets</h3>
+
+</div>
+{% endif %}
+
+{% if paginacion and paginacion.total %}
+<nav class="paginacion" aria-label="Paginación de tickets">
+    <span class="resumen-paginacion">
+        Página {{ paginacion.page }} de {{ paginacion.pages }} ·
+        {{ paginacion.total }} tickets
+    </span>
+    <div class="enlaces-paginacion">
+        {% if paginacion.has_prev %}
+        <a href="{{ url_for('tickets.listar_tickets', page=paginacion.prev_num, **filtros_enlace) }}">Anterior</a>
+        {% endif %}
+        {% for numero in paginacion.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+            {% if numero %}
+                {% if numero == paginacion.page %}
+                <span class="pagina-actual" aria-current="page">{{ numero }}</span>
+                {% else %}
+                <a href="{{ url_for('tickets.listar_tickets', page=numero, **filtros_enlace) }}">{{ numero }}</a>
+                {% endif %}
+            {% else %}
+            <span class="separador-paginacion">...</span>
+            {% endif %}
+        {% endfor %}
+        {% if paginacion.has_next %}
+        <a href="{{ url_for('tickets.listar_tickets', page=paginacion.next_num, **filtros_enlace) }}">Siguiente</a>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}
+
+>>>>>>> origin/deploy-sqlite
+{% endblock %}

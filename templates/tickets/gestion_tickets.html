@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block container_class %}contenedor-tickets{% endblock %}
+{% block content %}
+
+<div class="encabezado-tickets">
+    <div>
+        <h2>Gestión de tickets</h2>
+        <p>Arrastra las tarjetas entre columnas para actualizar su estado.</p>
+    </div>
+    <div class="acciones-pagina">
+        <a class="boton-secundario" href="{{ url_for('tickets.listar_tickets') }}">Volver al listado</a>
+    </div>
+</div>
+
+{% if errores %}
+<div class="errores" role="alert">
+    <ul>{% for error in errores %}<li>{{ error }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<form class="filtros-tickets" method="get">
+    <div class="campo-filtro">
+        <label for="gestion_fecha_desde">Fecha desde</label>
+        <input id="gestion_fecha_desde" name="fecha_desde" type="date" value="{{ valores_filtro.fecha_desde }}">
+    </div>
+    <div class="campo-filtro">
+        <label for="gestion_fecha_hasta">Fecha hasta</label>
+        <input id="gestion_fecha_hasta" name="fecha_hasta" type="date" value="{{ valores_filtro.fecha_hasta }}">
+    </div>
+    {% if current_user.EsAdministrador %}
+    <div class="campo-filtro">
+        <label for="gestion_empresa_id">Empresa</label>
+        <select id="gestion_empresa_id" name="empresa_id">
+            <option value="">Todas las empresas</option>
+            {% for empresa in empresas %}
+            <option value="{{ empresa.IdEmpresa }}" {% if valores_filtro.empresa_id == empresa.IdEmpresa|string %}selected{% endif %}>{{ empresa.NombreEmpresa }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="campo-filtro">
+        <label for="gestion_usuario_id">Usuario</label>
+        <select id="gestion_usuario_id" name="usuario_id">
+            <option value="">Todos los usuarios</option>
+            {% for usuario in usuarios %}
+            <option value="{{ usuario.IdUsuario }}" {% if valores_filtro.usuario_id == usuario.IdUsuario|string %}selected{% endif %}>{{ usuario.Usuario }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+    <div class="campo-filtro">
+        <label for="gestion_tipo_ticket_id">Tipo</label>
+        <select id="gestion_tipo_ticket_id" name="tipo_ticket_id">
+            <option value="">Todos los tipos</option>
+            {% for tipo in tipos_ticket %}
+            <option value="{{ tipo.IdTipoTicket }}" {% if valores_filtro.tipo_ticket_id == tipo.IdTipoTicket|string %}selected{% endif %}>{{ tipo.NombreTipo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="acciones-filtros">
+        <button type="submit">Filtrar</button>
+        <a class="boton-secundario" href="{{ url_for('tickets.gestion_tickets') }}">Limpiar</a>
+    </div>
+</form>
+
+<div class="kanban" aria-label="Tablero de gestión de tickets">
+    {% for estado in ('Abierto', 'En Progreso', 'Cerrado') %}
+    <section class="kanban-columna" data-estado="{{ estado }}" aria-label="Tickets {{ estado }}">
+        <header class="kanban-columna-cabecera">
+            <h3>{{ estado }}</h3>
+            <span class="kanban-contador">{{ tickets|selectattr('Estado', 'equalto', estado)|list|length }}</span>
+        </header>
+        <div class="kanban-tarjetas">
+            {% for ticket in tickets if ticket.Estado == estado %}
+            <article class="kanban-tarjeta" draggable="true" data-ticket-id="{{ ticket.IdTicket }}" data-estado="{{ estado }}">
+                <div class="kanban-tarjeta-titulo"><strong>#{{ ticket.IdTicket }}</strong> {{ ticket.Titulo }}</div>
+                <div class="kanban-descripcion">{{ ticket.Descripcion }}</div>
+                <dl class="kanban-detalles">
+                    <dt>Tipo</dt><dd>{{ ticket.tipo_ticket.NombreTipo if ticket.tipo_ticket else 'Sin tipo' }}</dd>
+                    <dt>Apertura</dt><dd>{{ ticket.FechaApertura.strftime('%d/%m/%Y') if ticket.FechaApertura else 'Sin fecha' }}</dd>
+                    <dt>Cierre</dt><dd class="kanban-cierre">{{ ticket.FechaCierre.strftime('%d/%m/%Y') if ticket.FechaCierre else 'Sin fecha' }}</dd>
+                    <dt>HH</dt><dd>{{ ticket.TotalHH }}</dd>
+                </dl>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endfor %}
+</div>
+
+<script>
+const columnas = document.querySelectorAll(".kanban-columna");
+let tarjetaArrastrada = null;
+let estadoOriginal = null;
+
+function actualizarContadores() {
+  columnas.forEach(columna => {
+    columna.querySelector(".kanban-contador").textContent =
+      columna.querySelectorAll(".kanban-tarjeta").length;
+  });
+}
+
+document.querySelectorAll(".kanban-tarjeta").forEach(tarjeta => {
+  tarjeta.addEventListener("dragstart", event => {
+    tarjetaArrastrada = tarjeta;
+    estadoOriginal = tarjeta.dataset.estado;
+    tarjeta.classList.add("arrastrando");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", tarjeta.dataset.ticketId);
+  });
+  tarjeta.addEventListener("dragend", () => {
+    tarjeta.classList.remove("arrastrando");
+    tarjetaArrastrada = null;
+    estadoOriginal = null;
+  });
+});
+
+columnas.forEach(columna => {
+  columna.addEventListener("dragover", event => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    columna.classList.add("arrastre-activo");
+  });
+  columna.addEventListener("dragleave", () => columna.classList.remove("arrastre-activo"));
+  columna.addEventListener("drop", async event => {
+    event.preventDefault();
+    columna.classList.remove("arrastre-activo");
+    if (!tarjetaArrastrada) return;
+    const nuevoEstado = columna.dataset.estado;
+    if (nuevoEstado === estadoOriginal) return;
+    const tarjeta = tarjetaArrastrada;
+    const estadoAnterior = estadoOriginal;
+    const columnaOriginal = [...columnas].find(item => item.dataset.estado === estadoAnterior);
+    columna.querySelector(".kanban-tarjetas").appendChild(tarjeta);
+    tarjeta.dataset.estado = nuevoEstado;
+    actualizarContadores();
+    try {
+      const respuesta = await fetch(`/ticket/${tarjeta.dataset.ticketId}/estado`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({estado: nuevoEstado})
+      });
+      const datos = await respuesta.json();
+      if (!respuesta.ok || !datos.success) throw new Error(datos.mensaje || "No se pudo guardar el estado.");
+      tarjeta.querySelector(".kanban-cierre").textContent = datos.fecha_cierre || "Sin fecha";
+    } catch (error) {
+      columnaOriginal.querySelector(".kanban-tarjetas").appendChild(tarjeta);
+      tarjeta.dataset.estado = estadoAnterior;
+      actualizarContadores();
+      window.alert(error.message);
+    }
+  });
+});
+</script>
+{% endblock %}

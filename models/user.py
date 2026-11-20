@@ -27,10 +27,51 @@ class User(UserMixin, db.Model):
         db.String(500)
     )
 
+    totp_secret = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    totp_verificado = db.Column(
+        db.Boolean,
+        default=False,
+        nullable=False
+    )
+
     Activo = db.Column(
         db.Boolean,
         default=True
     )
+
+    IdPerfil = db.Column(
+        db.Integer,
+        db.ForeignKey("Perfiles.IdPerfil")
+    )
+
+    IdEmpresa = db.Column(
+        db.Integer,
+        db.ForeignKey("Empresas.IdEmpresa")
+    )
+
+    IdGrupo = db.Column(
+        db.Integer,
+        db.ForeignKey("GruposTrabajo.IdGrupo")
+    )
+
+    perfil = db.relationship("Perfil")
+    empresa = db.relationship("Empresa")
+    grupo = db.relationship("GrupoTrabajo", back_populates="usuarios")
+
+    @property
+    def EsAdministrador(self):
+        return bool(self.perfil and self.perfil.EsAdministrador)
+
+    @property
+    def EsUsuario(self):
+        return bool(
+            self.perfil
+            and self.perfil.NombrePerfil.casefold() == "usuario"
+        )
 
     def get_id(self):
         return str(self.IdUsuario)

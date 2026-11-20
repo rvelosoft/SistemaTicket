@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ 'Editar tipo de ticket' if tipo.IdTipoTicket else 'Crear tipo de ticket' }}</h2>
+{% if errores %}
+<div class="errores">
+    <ul>{% for error in errores %}<li>{{ error }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+<form method="post">
+    <label for="nombre">Nombre del tipo</label>
+    <input id="nombre" name="nombre" maxlength="100" required value="{{ nombre }}">
+    <button type="submit">Guardar tipo</button>
+</form>
+<a href="{{ url_for('maintenance.tipos_ticket') }}">Volver a tipos de ticket</a>
+{% endblock %}

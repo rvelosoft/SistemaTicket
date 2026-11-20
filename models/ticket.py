@@ -33,9 +33,25 @@ class Ticket(db.Model):
         db.String(30)
     )
 
+    IdTipoTicket = db.Column(
+        db.Integer,
+        db.ForeignKey("TiposTicket.IdTipoTicket"),
+        nullable=False
+    )
+
     UsuarioCreacion = db.Column(
         db.Integer,
         db.ForeignKey(
             "Usuarios.IdUsuario"
         )
+    )
+
+    usuario_creacion = db.relationship(
+        "User",
+        foreign_keys=[UsuarioCreacion]
+    )
+
+    tipo_ticket = db.relationship(
+        "TipoTicket",
+        foreign_keys=[IdTipoTicket]
     )

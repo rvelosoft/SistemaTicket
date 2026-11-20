@@ -1,0 +1,193 @@
+<<<<<<< HEAD
+
+{% extends 'base.html' %}
+
+{% block title %}Mantención de usuarios | Registro de Actividades{% endblock %}
+{% block container_class %}contenedor-mantenimientos{% endblock %}
+
+{% block content %}
+<div class="usuarios-page">
+
+    <div class="usuarios-header">
+        <div>
+            <span class="usuarios-eyebrow">ADMINISTRACIÓN DEL SISTEMA</span>
+            <h2>Mantención de usuarios</h2>
+            <p>Consulta y actualiza las cuentas, perfiles, empresas y grupos asignados.</p>
+        </div>
+
+        <div class="usuarios-actions">
+            <a class="usuarios-btn usuarios-btn-primary"
+               href="{{ url_for('maintenance.editar_usuario') }}">
+                <span>＋</span> Crear usuario
+            </a>
+
+            <a class="usuarios-btn usuarios-btn-secondary"
+               href="{{ url_for('maintenance.index') }}">
+                ← Volver
+            </a>
+        </div>
+    </div>
+
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% for categoria, mensaje in mensajes %}
+            <div class="usuarios-alert {{ categoria }}">
+                {{ mensaje }}
+            </div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="usuarios-summary">
+        <div class="usuarios-summary-icon">♙</div>
+        <div>
+            <strong>Usuarios registrados</strong>
+            <span>Administración de cuentas y asignaciones</span>
+        </div>
+        <div class="usuarios-summary-count">
+            {{ usuarios|length }}
+        </div>
+    </div>
+
+    <div class="usuarios-table-card">
+        <div class="usuarios-table-heading">
+            <div>
+                <h3>Listado de usuarios</h3>
+                <p>Detalle de cuentas registradas en el sistema</p>
+            </div>
+            <span class="usuarios-table-label">CUENTAS</span>
+        </div>
+
+        <div class="usuarios-table-wrapper">
+            <table class="usuarios-table">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nombre completo</th>
+                        <th>Correo</th>
+                        <th>Perfil</th>
+                        <th>Empresa</th>
+                        <th>Grupo</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>
+                            <span class="usuario-identificador">
+                                {{ usuario.Usuario }}
+                            </span>
+                        </td>
+
+                        <td class="usuario-nombre">
+                            {{ usuario.NombreCompleto }}
+                        </td>
+
+                        <td class="usuario-correo">
+                            {{ usuario.Correo or 'Sin correo' }}
+                        </td>
+
+                        <td>
+                            <span class="usuario-tag perfil">
+                                {{ usuario.perfil.NombrePerfil if usuario.perfil else 'Sin asignar' }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ usuario.empresa.NombreEmpresa if usuario.empresa else 'Sin asignar' }}
+                        </td>
+
+                        <td>
+                            {{ usuario.grupo.NombreGrupo if usuario.grupo else 'Sin asignar' }}
+                        </td>
+
+                        <td>
+                            {% if usuario.Activo %}
+                                <span class="usuario-status activo">
+                                    <span></span> Activo
+                                </span>
+                            {% else %}
+                                <span class="usuario-status inactivo">
+                                    <span></span> Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-center">
+                            <a class="usuario-edit-btn"
+                               href="{{ url_for('maintenance.editar_usuario', user_id=usuario.IdUsuario) }}">
+                                <span>✎</span> Editar
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="usuarios-empty">
+                            <div class="usuarios-empty-icon">♙</div>
+                            <strong>No hay usuarios registrados</strong>
+                            <p>Cuando se creen cuentas, aparecerán en este listado.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="usuarios-table-footer">
+            <span>Registro de Actividades</span>
+            <span>{{ usuarios|length }} usuario(s) en total</span>
+        </div>
+    </div>
+
+=======
+{% extends 'base.html' %}
+{% block container_class %}contenedor-mantenimientos{% endblock %}
+{% block content %}
+<div class="encabezado-tickets">
+    <div>
+        <h2>Mantención de usuarios</h2>
+        <p>Consulta y actualiza las cuentas, perfiles, empresas y grupos asignados.</p>
+    </div>
+    <div class="acciones-pagina">
+        <a href="{{ url_for('maintenance.editar_usuario') }}">Crear usuario</a>
+        <a class="boton-secundario" href="{{ url_for('maintenance.index') }}">Volver</a>
+    </div>
+</div>
+{% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, mensaje in mensajes %}
+        <p class="{{ categoria }}">{{ mensaje }}</p>
+    {% endfor %}
+{% endwith %}
+<div class="tabla-tickets-contenedor">
+    <table class="tabla-tickets tabla-usuarios">
+        <thead>
+            <tr><th>Usuario</th><th>Nombre completo</th><th>Correo</th><th>Perfil</th><th>Empresa</th><th>Grupo</th><th>Estado</th><th>2FA inicial</th><th>Acción</th></tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.Usuario }}</td>
+                <td>{{ usuario.NombreCompleto }}</td>
+                <td>{{ usuario.Correo }}</td>
+                <td>{{ usuario.perfil.NombrePerfil if usuario.perfil else 'Sin asignar' }}</td>
+                <td>{{ usuario.empresa.NombreEmpresa if usuario.empresa else 'Sin asignar' }}</td>
+                <td>{{ usuario.grupo.NombreGrupo if usuario.grupo else 'Sin asignar' }}</td>
+                <td>{{ 'Activo' if usuario.Activo else 'Inactivo' }}</td>
+                <td>{{ 'Verificado' if usuario.totp_verificado else 'Pendiente' }}</td>
+                <td>
+                    <a href="{{ url_for('maintenance.editar_usuario', user_id=usuario.IdUsuario) }}">Editar</a>
+                    <form method="post" action="{{ url_for('maintenance.eliminar_usuario', user_id=usuario.IdUsuario) }}" style="display:inline" onsubmit="return confirm('¿Eliminar este usuario?');">
+                        <button type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="9">No hay usuarios registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+>>>>>>> origin/deploy-sqlite
+</div>
+{% endblock %}

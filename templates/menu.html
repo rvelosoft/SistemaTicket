@@ -1,45 +1,77 @@
+
 {% extends 'base.html' %}
+
+{% block title %}
+Menú Principal | Registro de Actividades
+{% endblock %}
+
 {% block content %}
-<h2>Menú Principal</h2>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
+<div class="internal-menu-content">
 
-        <div id="modalExito" class="modal">
+    <!-- ENCABEZADO -->
+    <section class="internal-heading">
 
-            <div class="modal-contenido">
+        <div>
+            <span class="internal-eyebrow">
+                PLATAFORMA DE GESTIÓN Y CONTROL
+            </span>
 
-                <h2>Operación Exitosa</h2>
+            <h2>Menú Principal</h2>
+
+            <p>
+                Selecciona una opción para continuar trabajando.
+            </p>
+        </div>
+
+    </section>
+
+
+    <!-- NOTIFICACIONES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            <div id="notificacionExito"
+                 class="notificacion-exito"
+                 role="status">
 
                 {% for category, message in messages %}
                     <p>{{ message }}</p>
                 {% endfor %}
 
-                    <button
-                        type="button"
-                        onclick="document.getElementById('modalExito').style.display='none'">
-                        Aceptar
-                    </button>
-
             </div>
 
-        </div>
+            <script>
+                window.setTimeout(() => {
+                    const notification =
+                        document.getElementById("notificacionExito");
 
-    {% endif %}
-{% endwith %}
+                    if (notification) {
+                        notification.remove();
+                    }
+                }, 4000);
+            </script>
 
-<ul>
-<li>
+        {% endif %}
 
-<a href="/ticket/nuevo">
-Nuevo Ticket
-</a>
-</li>
-<li>
-<a href="/logout">
-Cerrar Sesión
-</a>
-</li>
-</ul>
+    {% endwith %}
+
+
+    <!-- CONTENIDO DEL MENÚ -->
+    <section class="menu-welcome">
+
+        <div class="welcome-icon">▤</div>
+
+        <h3>Bienvenido al Registro de Actividades</h3>
+
+        <p>
+            Desde la navegación superior puedes acceder a las
+            funcionalidades disponibles según tu perfil de usuario.
+        </p>
+
+    </section>
+
+</div>
+
 {% endblock %}
-

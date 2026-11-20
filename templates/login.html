@@ -1,46 +1,655 @@
-
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Acceso al sistema</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Registro de Actividades | Acceso</title>
+
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+          href="{{ url_for('static', filename='css/style_oscuro.css') }}">
 </head>
+
 <body>
 
-<div class="contenedor">
+<div class="landing-page">
 
-    <h1>Registro de Actividades</h1>
-    <h3>Iniciar sesión</h3>
+    <!-- =====================================
+         PRIMERA FRANJA: PORTADA Y LOGIN
+    ====================================== -->
 
-    {% with mensajes = get_flashed_messages(with_categories=true) %}
-        {% for categoria, mensaje in mensajes %}
-            <p class="{{ categoria }}">{{ mensaje }}</p>
-        {% endfor %}
-    {% endwith %}
+    <header class="hero-header">
 
-<form action="{{ url_for('auth.do_login') }}" method="POST">
+        <!-- PRESENTACIÓN -->
+        <section class="hero-content">
 
-    <label>Usuario</label>
-    <input
-        type="text"
-        name="usuario"
-        required
-        autocomplete="username">
+            <div class="eyebrow">
+                <span class="status-dot"></span>
+                PLATAFORMA DE GESTIÓN Y CONTROL
+            </div>
 
-    <label>Contraseña</label>
-    <input
-        type="password"
-        name="password"
-        required
-        autocomplete="current-password">
+            <h1>
+                Gestión de actividades.
+          <span> Registro centralizado de tareas y actividades de los equipos de trabajo 
+            
+          </span>
+            </h1>
 
-    <button type="submit">
-        Ingresar
-    </button>
+            <p>
+                Registro, control y seguimiento de las actividades 
+                de los equipos de trabajo en una única plataforma,
+                facilitando la gestión operativa y la visibilidad
+                del trabajo realizado.
+            </p>
 
-</form>
+            <!-- FUNCIONALIDADES PRINCIPALES -->
+
+            <div class="hero-features">
+
+                <div class="feature">
+                    <span class="feature-icon blue">▤</span>
+
+                    <div>
+                        <strong>Registro</strong>
+                        <small>Actividades y tareas</small>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <span class="feature-icon cyan">◉</span>
+
+                    <div>
+                        <strong>Seguimiento</strong>
+                        <small>Control de avances</small>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <span class="feature-icon purple">▥</span>
+
+                    <div>
+                        <strong>Reportabilidad</strong>
+                        <small>Informes e indicadores</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- LOGIN SUPERIOR DERECHO -->
+
+        <aside class="login-container">
+
+            <div class="login-title">
+
+                <span class="login-icon">♙</span>
+
+                <div>
+                    <strong>Acceso al sistema</strong>
+                    <small>Ingresa con tus credenciales</small>
+                </div>
+
+            </div>
+
+
+            <!-- MENSAJES FLASK -->
+
+            {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+                {% for categoria, mensaje in mensajes %}
+
+                    <div class="alert {{ categoria }}">
+                        {{ mensaje }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+            <!-- FORMULARIO DE AUTENTICACIÓN -->
+
+            <form action="{{ url_for('auth.do_login') }}"
+                  method="POST"
+                  class="login-form">
+
+                <div class="form-group">
+
+                    <label for="usuario">
+                        Usuario
+                    </label>
+
+                    <input
+                        type="text"
+                        id="usuario"
+                        name="usuario"
+                        placeholder="Ingresa tu usuario"
+                        autocomplete="username"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Contraseña
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Ingresa tu contraseña"
+                        autocomplete="current-password"
+                        required>
+
+                </div>
+
+
+                <button type="submit" class="login-button">
+                    Ingresar al sistema
+                    <span>→</span>
+                </button>
+
+            </form>
+
+
+            <div class="login-footer">
+                Acceso exclusivo para usuarios autorizados
+            </div>
+
+        </aside>
+
+    </header>
+
+
+    <!-- =====================================
+         SEPARADOR ENTRE AMBAS FRANJAS
+    ====================================== -->
+
+    <div class="section-divider"></div>
+
+
+    <!-- =====================================
+         SEGUNDA FRANJA: DASHBOARD
+    ====================================== -->
+
+    <main class="dashboard-showcase">
+
+        <div class="dashboard-window">
+
+
+            <!-- =================================
+                 SIDEBAR
+            ================================== -->
+
+            <aside class="mock-sidebar">
+
+                <div class="mock-brand">
+
+                    <span class="mock-brand-mark">▤</span>
+
+                    <span>Registro de Actividades</span>
+
+                </div>
+
+
+                <div class="mock-nav-heading">
+                    OPERACIÓN
+                </div>
+
+
+                <nav class="mock-nav">
+
+                    <div class="mock-nav-item active">
+                        <span>▤</span>
+                        Registro de actividades
+                    </div>
+
+                    <div class="mock-nav-item">
+                        <span>◷</span>
+                        Seguimiento
+                    </div>
+
+                    <div class="mock-nav-item">
+                        <span>▦</span>
+                        Panel de control
+                    </div>
+
+                    <div class="mock-nav-item">
+                        <span>▣</span>
+                        Calendario
+                    </div>
+
+                    <div class="mock-nav-item">
+                        <span>▥</span>
+                        Reportes
+                    </div>
+
+                    <div class="mock-nav-item">
+                        <span>♧</span>
+                        Equipos
+                    </div>
+
+                </nav>
+
+
+                <div class="mock-divider"></div>
+
+
+                <div class="mock-nav-heading">
+                    CONFIGURACIÓN
+                </div>
+
+
+                <nav class="mock-nav">
+
+                    <div class="mock-nav-item">
+                        <span>⚙</span>
+                        Usuarios y roles
+                    </div>
+
+                    <div class="mock-nav-item">
+                        <span>◇</span>
+                        Categorías
+                    </div>
+
+                    <div class="mock-nav-item">
+                        <span>♧</span>
+                        Notificaciones
+                    </div>
+
+                </nav>
+
+            </aside>
+
+
+
+            <!-- =================================
+                 CONTENIDO DEL DASHBOARD
+            ================================== -->
+
+            <section class="mock-main">
+
+
+                <!-- ENCABEZADO -->
+
+                <header class="mock-page-header">
+
+                    <h2>Registro de Actividades</h2>
+
+                    <p>
+                        Registro, seguimiento y control de actividades del equipo
+                    </p>
+
+                </header>
+
+
+
+                <!-- FILTROS -->
+
+                <section class="mock-filters">
+
+                    <strong>Período</strong>
+
+                    <select aria-label="Tipo de período">
+                        <option>Rango de fechas</option>
+                    </select>
+
+                    <div class="mock-date">
+                        ▣ 01-11-2026
+                    </div>
+
+                    <span>al</span>
+
+                    <div class="mock-date">
+                        ▣ 17-11-2026
+                    </div>
+
+                    <button type="button">
+                        ▽ Aplicar filtro
+                    </button>
+
+                </section>
+
+
+
+                <!-- INDICADORES -->
+
+                <section class="mock-metrics"
+                         aria-label="Indicadores de actividades">
+
+
+                    <article class="mock-metric">
+
+                        <span class="metric-icon blue">▤</span>
+
+                        <div>
+                            <small>Actividades totales</small>
+                            <strong>1.044</strong>
+                            <small>Total del período</small>
+                        </div>
+
+                    </article>
+
+
+                    <article class="mock-metric">
+
+                        <span class="metric-icon green">◷</span>
+
+                        <div>
+                            <small>Pendientes</small>
+                            <strong>91</strong>
+                            <small>Por iniciar o en espera</small>
+                        </div>
+
+                    </article>
+
+
+                    <article class="mock-metric">
+
+                        <span class="metric-icon cyan">▷</span>
+
+                        <div>
+                            <small>En ejecución</small>
+                            <strong>24</strong>
+                            <small>En desarrollo</small>
+                        </div>
+
+                    </article>
+
+
+                    <article class="mock-metric">
+
+                        <span class="metric-icon purple">✓</span>
+
+                        <div>
+                            <small>Finalizadas</small>
+                            <strong>953</strong>
+                            <small>Actividades terminadas</small>
+                        </div>
+
+                    </article>
+
+
+                    <article class="mock-metric">
+
+                        <span class="metric-icon red">!</span>
+
+                        <div>
+                            <small>Fuera de plazo</small>
+                            <strong>4</strong>
+                            <small>Actividades vencidas</small>
+                        </div>
+
+                    </article>
+
+
+                    <article class="mock-metric">
+
+                        <span class="metric-icon amber">♙</span>
+
+                        <div>
+                            <small>Sin asignar</small>
+                            <strong>1</strong>
+                            <small>Pendiente de asignación</small>
+                        </div>
+
+                    </article>
+
+                </section>
+
+
+
+                <!-- PESTAÑAS DE ESTADO -->
+
+                <section class="mock-tabs"
+                         aria-label="Estados de actividades">
+
+                    <span class="selected">
+                        Todas (1.044)
+                    </span>
+
+                    <span>
+                        Pendientes (91)
+                    </span>
+
+                    <span>
+                        En ejecución (24)
+                    </span>
+
+                    <span>
+                        Finalizadas (953)
+                    </span>
+
+                    <span>
+                        Fuera de plazo (4)
+                    </span>
+
+                    <span>
+                        Sin asignar (1)
+                    </span>
+
+                </section>
+
+
+
+                <!-- BUSCADOR -->
+
+                <div class="mock-search">
+
+                    <span>⌕</span>
+
+                    Buscar actividad, responsable o proyecto...
+
+                </div>
+
+
+
+                <!-- TABLA DE ACTIVIDADES -->
+
+                <div class="mock-table-wrap">
+
+                    <table class="mock-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="check-cell">□</th>
+
+                                <th>Actividad</th>
+
+                                <th>Responsable</th>
+
+                                <th>Fecha límite</th>
+
+                                <th>Prioridad</th>
+
+                                <th>Estado</th>
+
+                                <th>Acciones</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            <!-- ACTIVIDAD 1 -->
+
+                            <tr>
+
+                                <td>□</td>
+
+                                <td>
+                                    <b>
+                                        Revisar respaldos de infraestructura
+                                    </b>
+
+                                    <small>
+                                        Proyecto: Operación TI
+                                    </small>
+                                </td>
+
+                                <td>
+                                    Camila Rojas
+                                </td>
+
+                                <td>
+                                    ▣ 19-11-2026
+
+                                    <small>
+                                        En 2 días
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <span class="mock-pill high">
+                                        ⌃ Alta
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="mock-pill progress">
+                                        ▷ En ejecución
+                                    </span>
+                                </td>
+
+                                <td>⋮</td>
+
+                            </tr>
+
+
+
+                            <!-- ACTIVIDAD 2 -->
+
+                            <tr>
+
+                                <td>□</td>
+
+                                <td>
+                                    <b>
+                                        Actualizar inventario de activos TI
+                                    </b>
+
+                                    <small>
+                                        Proyecto: Gestión de Activos
+                                    </small>
+                                </td>
+
+                                <td>
+                                    Rodrigo Méndez
+                                </td>
+
+                                <td>
+                                    ▣ 24-11-2026
+
+                                    <small>
+                                        En 7 días
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <span class="mock-pill medium">
+                                        ＝ Media
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="mock-pill pending">
+                                        ◷ Pendiente
+                                    </span>
+                                </td>
+
+                                <td>⋮</td>
+
+                            </tr>
+
+
+
+                            <!-- ACTIVIDAD 3 -->
+
+                            <tr>
+
+                                <td>□</td>
+
+                                <td>
+                                    <b>
+                                        Validar monitoreo de servicios
+                                    </b>
+
+                                    <small>
+                                        Proyecto: Continuidad Operacional
+                                    </small>
+                                </td>
+
+                                <td>
+                                    Felipe Araya
+                                </td>
+
+                                <td>
+                                    ▣ 17-11-2026
+
+                                    <small class="overdue">
+                                        Fuera de plazo
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <span class="mock-pill low">
+                                        ⌄ Baja
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="mock-pill done">
+                                        ✓ Finalizada
+                                    </span>
+                                </td>
+
+                                <td>⋮</td>
+
+                            </tr>
+
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =====================================
+         PIE DE PÁGINA
+    ====================================== -->
+
+    <footer class="page-footer">
+
+        <span>
+            © Registro de Actividades
+        </span>
+
+        <span>
+            Plataforma de gestión y seguimiento
+        </span>
+
+    </footer>
+
 
 </div>
 

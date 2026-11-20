@@ -1,25 +1,136 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>HelpDesk</title>
+    <title>{% block title %}Registro de Actividades{% endblock %}</title>
 
-<link rel="stylesheet"
-href="{{ url_for('static',
-filename='css/style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style_oscuro.css') }}">
 
+    {% block extra_head %}{% endblock %}
 </head>
 
 <body>
 
-<div class="container">
+<div class="container {% block container_class %}{% endblock %}">
 
-{% block content %}
-{% endblock %}
+    {% if current_user.is_authenticated %}
+
+    <!-- =====================================
+         NAVEGACIÓN GLOBAL
+         Se muestra en todas las páginas
+    ====================================== -->
+
+    <header class="internal-topbar">
+
+        <!-- MENÚ HORIZONTAL -->
+        <nav class="internal-options">
+
+            {% if es_administrador is defined and not es_administrador %}
+
+            <a href="/ticket/nuevo" class="internal-option">
+                <span class="internal-option-icon blue">＋</span>
+
+                <span class="internal-option-text">
+                    <strong>Nuevo Ticket</strong>
+                    <small>Crear una solicitud</small>
+                </span>
+
+                <span class="option-arrow">→</span>
+            </a>
+
+            {% endif %}
+
+
+            <a href="{{ url_for('tickets.listar_tickets') }}"
+               class="internal-option">
+
+                <span class="internal-option-icon blue">▤</span>
+
+                <span class="internal-option-text">
+                    <strong>Consultar Tickets</strong>
+                    <small>Consulta y seguimiento</small>
+                </span>
+
+                <span class="option-arrow">→</span>
+            </a>
+
+
+            {% if es_administrador is defined and es_administrador %}
+
+            <a href="{{ url_for('maintenance.index') }}"
+               class="internal-option">
+
+                <span class="internal-option-icon cyan">⚙</span>
+
+                <span class="internal-option-text">
+                    <strong>Mantención de tablas y parámetros</strong>
+                    <small>Administración del sistema</small>
+                </span>
+
+                <span class="option-arrow">→</span>
+            </a>
+
+            {% endif %}
+
+        </nav>
+
+
+        <!-- SEPARADOR DEL PERFIL -->
+        <div class="profile-divider"></div>
+
+
+        <!-- PERFIL Y CIERRE DE SESIÓN -->
+        <div class="user-profile">
+
+            <div class="profile-avatar">
+                ♙
+            </div>
+
+            <div class="profile-information">
+
+                <strong>
+                    {{ current_user.NombreCompleto or current_user.Usuario }}
+                </strong>
+
+                <small>
+                    {{ current_user.empresa.NombreEmpresa
+                       if current_user.empresa
+                       else 'Sin empresa asignada' }}
+                </small>
+
+                <a href="/logout" class="logout-button">
+                    <span>↪</span>
+                    Cerrar sesión
+                </a>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    {% endif %}
+
+
+    <!-- =====================================
+         CONTENIDO DE CADA PÁGINA
+    ====================================== -->
+
+    <main class="page-content">
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
 
 </div>
 
-</body>
+{% block extra_scripts %}{% endblock %}
 
+</body>
 </html>

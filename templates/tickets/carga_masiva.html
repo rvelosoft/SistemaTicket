@@ -1,21 +1,16 @@
 {% extends 'base.html' %}
-{% block container_class %}contenedor-tickets{% endblock %}
+{% block title %}Ingreso masivo de tickets | Registro de Actividades{% endblock %}
 {% block content %}
-<div class="encabezado-tickets">
+<div class="ticket-page carga-masiva-page">
+<div class="ticket-page-header">
     <div>
+        <span class="ticket-eyebrow">REGISTRO DE ACTIVIDADES</span>
         <h2>Ingreso masivo de tickets</h2>
         <p>Pega filas copiadas desde Excel o completa las celdas directamente.</p>
     </div>
-    <div class="acciones-pagina">
-        <a class="boton-secundario" href="{{ url_for('tickets.nuevo_ticket') }}">Volver al ingreso individual</a>
-        {% if current_user.EsUsuario %}
-        <a class="boton-secundario" href="{{ url_for('tickets.listar_tickets') }}">Volver</a>
-        {% else %}
-        <a class="boton-secundario" href="{{ url_for('home.menu') }}">Volver al menú</a>
-        {% endif %}
-    </div>
 </div>
 
+<section class="ticket-form-card carga-masiva-card">
 <p class="instrucciones-carga">
     Orden de columnas: Fecha apertura, Fecha cierre, Título, Descripción,
     Total HH, Tipo y Estado. Las fechas aceptan AAAA-MM-DD o DD/MM/AAAA; estado:
@@ -47,6 +42,8 @@
         </thead>
         <tbody id="filasTickets"></tbody>
     </table>
+</div>
+</section>
 </div>
 
 <script>

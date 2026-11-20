@@ -5,14 +5,14 @@
 {% block content %}
 <style>
 .estadisticas-container{width:min(100%,1440px);padding:28px;border:0;border-radius:0;background:transparent;box-shadow:none}
-.estadisticas-page{--stats-bg:#f4f7fb;--stats-panel:#fff;--stats-text:#172033;--stats-muted:#667085;--stats-line:#e5eaf1;--stats-blue:#2563eb;--stats-red:#dc5b5b;--stats-green:#15966b;--stats-orange:#d98a19;--stats-shadow:0 8px 24px rgba(20,35,60,.06);color:var(--stats-text);font:14px/1.5 "Segoe UI",Arial,sans-serif}
+.estadisticas-page{--stats-bg:#101521;--stats-panel:#1b2433;--stats-text:#f3f6fc;--stats-muted:#aab6ca;--stats-line:#344155;--stats-blue:#1685ff;--stats-red:#ff8297;--stats-green:#64e7a2;--stats-orange:#ffd05b;--stats-shadow:0 12px 35px rgba(0,0,0,.22);color:var(--stats-text);font:14px/1.5 "Segoe UI",Arial,sans-serif}
 .estadisticas-page .header{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:24px}
 .estadisticas-page .eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--stats-blue);text-transform:uppercase}
 .estadisticas-page h1{font-size:26px;margin:3px 0 2px;color:var(--stats-text)}
 .estadisticas-page .subtitle{color:var(--stats-muted);margin:0}
 .estadisticas-page .actions{display:flex;gap:10px;flex-wrap:wrap}
 .estadisticas-page button,.estadisticas-page .actions a{border:0;border-radius:8px;padding:10px 15px;font-weight:650;cursor:pointer;background:var(--stats-blue);color:#fff;text-decoration:none}
-.estadisticas-page .actions a.secondary,.estadisticas-page button.secondary{background:#e9eef8;color:#26354d}
+.estadisticas-page .actions a.secondary,.estadisticas-page button.secondary{background:#202a3a;color:#cbd5e4;border:1px solid #465267}
 .estadisticas-page button:disabled{opacity:.55;cursor:wait}
 .estadisticas-page .filter-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:end;gap:14px;margin-bottom:20px}
 .estadisticas-page .filter-field{display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -20,8 +20,8 @@
 .estadisticas-page .card,.estadisticas-page .panel{background:var(--stats-panel);border:1px solid var(--stats-line);border-radius:13px;box-shadow:var(--stats-shadow)}
 .estadisticas-page .card{padding:17px 19px}
 .estadisticas-page .filter-controls label{font-size:12px;color:var(--stats-muted);font-weight:650;margin:0}
-.estadisticas-page .filter-controls select{width:100%;min-width:0;min-height:44px;margin:0;border:1px solid var(--stats-line);border-radius:8px;background:#fff;color:var(--stats-text);padding:8px 12px;font:inherit}
-.estadisticas-page .filter-controls button{width:100%;min-height:44px;margin:0;background:#e9eef8;color:#26354d}
+.estadisticas-page .filter-controls select{width:100%;min-width:0;min-height:44px;margin:0;border:1px solid #465267;border-radius:8px;background:#151e2c;color:var(--stats-text);padding:8px 12px;font:inherit}
+.estadisticas-page .filter-controls button{width:100%;min-height:44px;margin:0;background:#202a3a;color:#cbd5e4;border:1px solid #465267}
 .estadisticas-page .card .label{color:var(--stats-muted);font-size:12px;font-weight:650}
 .estadisticas-page .card .value{font-size:30px;font-weight:750;line-height:1.25;margin-top:5px}
 .estadisticas-page .card .hint{font-size:11px;color:var(--stats-muted);margin-top:4px}
@@ -30,24 +30,25 @@
 .estadisticas-page h2{font-size:16px;margin:0;color:var(--stats-text)}
 .estadisticas-page .panel-note{font-size:12px;color:var(--stats-muted);margin-top:3px}
 .estadisticas-page .legend{display:flex;gap:14px;flex-wrap:wrap}
-.estadisticas-page .legend label{display:flex;align-items:center;gap:6px;color:#475467;font-size:12px;cursor:pointer;margin:0}
+.estadisticas-page .legend label{display:flex;align-items:center;gap:6px;color:#cbd5e4;font-size:12px;cursor:pointer;margin:0}
 .estadisticas-page .legend input{width:auto;min-height:0;margin:0;accent-color:var(--stats-blue)}
 .estadisticas-page .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
 .estadisticas-page .chart-wrap{position:relative;width:100%;height:360px}
-.estadisticas-page .chart-tooltip{position:absolute;z-index:5;display:none;pointer-events:none;min-width:125px;padding:9px 11px;background:#172033;color:#fff;border-radius:8px;box-shadow:0 5px 18px rgba(0,0,0,.18);font-size:12px;line-height:1.55;white-space:nowrap}
+.estadisticas-page .chart-tooltip{position:absolute;z-index:5;display:none;pointer-events:none;min-width:125px;padding:9px 11px;background:#151e2c;color:#f3f6fc;border:1px solid #465267;border-radius:8px;box-shadow:0 5px 18px rgba(0,0,0,.35);font-size:12px;line-height:1.55;white-space:nowrap}
 .estadisticas-page .chart-tooltip strong{display:block;font-size:12px;margin-bottom:3px}
 .estadisticas-page .chart-tooltip .tip-row{display:flex;align-items:center;gap:7px}
 .estadisticas-page .chart-tooltip .tip-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
 .estadisticas-page canvas{width:100%;height:100%;display:block}
 .estadisticas-page .query-status{color:var(--stats-muted);font-size:12px;margin:10px 0 0;min-height:18px}
-.estadisticas-page .query-error{color:#b42318;font-size:13px;margin:10px 0 0}
+.estadisticas-page .query-error{color:#ff8297;font-size:13px;margin:10px 0 0}
 .estadisticas-page .table-wrap{overflow-x:auto}
 .estadisticas-page table{border-collapse:collapse;width:100%;font-size:13px}
 .estadisticas-page th,.estadisticas-page td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--stats-line);white-space:nowrap}
-.estadisticas-page th{color:#667085;font-size:11px;text-transform:uppercase;letter-spacing:.04em;background:#f8fafc}
+.estadisticas-page th{color:#cbd7e8;font-size:11px;text-transform:uppercase;letter-spacing:.04em;background:#222d3e}
+.estadisticas-page td{color:#dce5f2}
 .estadisticas-page th:first-child,.estadisticas-page td:first-child{text-align:left}
-.estadisticas-page tbody tr:hover{background:#f8fafc}
-.estadisticas-page tfoot{font-weight:750;background:#f8fafc}
+.estadisticas-page tbody tr:hover{background:#253348}
+.estadisticas-page tfoot{font-weight:750;background:#222d3e}
 .estadisticas-page .empty{text-align:center!important;color:var(--stats-muted);padding:28px}
 @media(max-width:850px){.estadisticas-page .filter-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.estadisticas-page .cards{grid-template-columns:repeat(2,minmax(0,1fr))}.estadisticas-page .header{align-items:flex-start;flex-direction:column}.estadisticas-page .chart-wrap{height:300px}}
 @media(max-width:480px){.estadisticas-container{padding:15px}.estadisticas-page .filter-controls{grid-template-columns:1fr;gap:10px}.estadisticas-page .cards{gap:9px}.estadisticas-page .card{padding:13px}.estadisticas-page .card .value{font-size:25px}.estadisticas-page .panel{padding:14px}.estadisticas-page .chart-wrap{height:260px}}
@@ -59,9 +60,6 @@
             <div class="eyebrow">ABENIS · Gestión de servicios</div>
             <h1>Estadísticas mensuales</h1>
             <p class="subtitle">Evolución de incidentes, requerimientos y warnings · año seleccionado</p>
-        </div>
-        <div class="actions">
-            <a class="secondary" href="{{ url_for('home.menu') }}">Volver al menú</a>
         </div>
     </header>
 
@@ -241,11 +239,11 @@ function dibujarGrafico(){
   ctx.textAlign="right";ctx.textBaseline="middle";
   for(let i=0;i<=4;i++){
     const valor=max*i/4,y=pad.t+plotH-(plotH*i/4);
-    ctx.strokeStyle="#e9edf3";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
-    ctx.fillStyle="#667085";ctx.fillText(Math.round(valor).toString(),pad.l-9,y);
+    ctx.strokeStyle="#344155";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();
+    ctx.fillStyle="#aab6ca";ctx.fillText(Math.round(valor).toString(),pad.l-9,y);
   }
   datosMeses.forEach((mes,indice)=>{
-    ctx.fillStyle="#667085";ctx.textAlign="center";ctx.textBaseline="top";
+    ctx.fillStyle="#aab6ca";ctx.textAlign="center";ctx.textBaseline="top";
     ctx.fillText(mes.label,x(indice),pad.t+plotH+13);
   });
   visibles.forEach(clave=>{
@@ -257,7 +255,7 @@ function dibujarGrafico(){
     ctx.stroke();
     puntos[clave].forEach(punto=>{ctx.beginPath();ctx.arc(punto.x,punto.y,3.5,0,Math.PI*2);ctx.fill();});
   });
-  if(!visibles.length){ctx.fillStyle="#667085";ctx.textAlign="center";ctx.fillText("Selecciona al menos una categoría",w/2,h/2);}
+  if(!visibles.length){ctx.fillStyle="#aab6ca";ctx.textAlign="center";ctx.fillText("Selecciona al menos una categoría",w/2,h/2);}
   geometriaGrafico={puntos,visibles};
   ocultarTooltip();
 }

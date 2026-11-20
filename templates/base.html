@@ -31,9 +31,22 @@
         <!-- MENÚ HORIZONTAL -->
         <nav class="internal-options">
 
-            {% if es_administrador is defined and not es_administrador %}
+            <a href="{{ url_for('tickets.listar_tickets') }}" class="internal-option">
 
-            <a href="/ticket/nuevo" class="internal-option">
+                <span class="internal-option-icon cyan">⌂</span>
+
+                <span class="internal-option-text">
+                    <strong>Inicio</strong>
+                    <small>Consulta y seguimiento</small>
+                </span>
+
+                <span class="option-arrow">→</span>
+
+            </a>
+
+            {% if not current_user.EsAdministrador %}
+
+            <a href="{{ url_for('tickets.nuevo_ticket') }}" class="internal-option">
 
                 <span class="internal-option-icon blue">＋</span>
 
@@ -48,23 +61,35 @@
 
             {% endif %}
 
-
-            <a href="{{ url_for('tickets.listar_tickets') }}"
+            <a href="{{ url_for('tickets.gestion_tickets') }}"
                class="internal-option">
 
-                <span class="internal-option-icon blue">▤</span>
+                <span class="internal-option-icon cyan">▦</span>
 
                 <span class="internal-option-text">
-                    <strong>Consultar Tickets</strong>
-                    <small>Consulta y seguimiento</small>
+                    <strong>Tablero Kanban</strong>
+                    <small>Gestión de estados</small>
                 </span>
 
                 <span class="option-arrow">→</span>
 
             </a>
 
+            {% if current_user.EsAdministrador %}
 
-            {% if es_administrador is defined and es_administrador %}
+            <a href="{{ url_for('estadisticas.pagina_estadisticas') }}"
+               class="internal-option">
+
+                <span class="internal-option-icon blue">▥</span>
+
+                <span class="internal-option-text">
+                    <strong>Estadísticas</strong>
+                    <small>Informes e indicadores</small>
+                </span>
+
+                <span class="option-arrow">→</span>
+
+            </a>
 
             <a href="{{ url_for('maintenance.index') }}"
                class="internal-option">
@@ -109,7 +134,7 @@
                        else 'Sin empresa asignada' }}
                 </small>
 
-                <a href="/logout" class="logout-button">
+                <a href="{{ url_for('auth.logout') }}" class="logout-button">
                     <span>↪</span>
                     Cerrar sesión
                 </a>

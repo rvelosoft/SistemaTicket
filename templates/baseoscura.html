@@ -4,33 +4,37 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gestión de tareas</title>
-  <link rel="stylesheet" href="../static/style_oscuro.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_oscuro.css') }}">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="#">
+      <a class="brand" href="{{ url_for('home.menu') }}">
         <span class="brand-mark">✓</span>
         <span>Gestión de tareas</span>
       </a>
 
       <div class="nav-heading">OPERACIÓN</div>
       <nav class="nav">
-        <a class="nav-item active" href="#"><span class="nav-icon">♙</span>Mis tareas</a>
-        <a class="nav-item" href="#"><span class="nav-icon">▱</span>Bandeja</a>
-        <a class="nav-item" href="#"><span class="nav-icon">▦</span>Tablero</a>
-        <a class="nav-item" href="#"><span class="nav-icon">▣</span>Calendario</a>
-        <a class="nav-item" href="#"><span class="nav-icon">▥</span>Reportes</a>
-        <a class="nav-item" href="#"><span class="nav-icon">♧</span>Equipos</a>
+        <a class="nav-item active" href="{{ url_for('home.menu') }}"><span class="nav-icon">♙</span>Mis tareas</a>
+        <a class="nav-item" href="{{ url_for('tickets.listar_tickets') }}"><span class="nav-icon">▱</span>Bandeja</a>
+        <a class="nav-item" href="{{ url_for('tickets.gestion_tickets') }}"><span class="nav-icon">▦</span>Tablero</a>
+        <span class="nav-item" aria-disabled="true"><span class="nav-icon">▣</span>Calendario</span>
+        {% if current_user.is_authenticated and current_user.EsAdministrador %}
+        <a class="nav-item" href="{{ url_for('estadisticas.pagina_estadisticas') }}"><span class="nav-icon">▥</span>Reportes</a>
+        <a class="nav-item" href="{{ url_for('maintenance.grupos') }}"><span class="nav-icon">♧</span>Equipos</a>
+        {% endif %}
       </nav>
 
+      {% if current_user.is_authenticated and current_user.EsAdministrador %}
       <div class="nav-divider"></div>
       <div class="nav-heading">CONFIGURACIÓN</div>
       <nav class="nav">
-        <a class="nav-item" href="#"><span class="nav-icon">⚙</span>Usuarios y roles</a>
-        <a class="nav-item" href="#"><span class="nav-icon">◇</span>Categorías</a>
-        <a class="nav-item" href="#"><span class="nav-icon">♧</span>Notificaciones</a>
+        <a class="nav-item" href="{{ url_for('maintenance.index') }}"><span class="nav-icon">⚙</span>Usuarios y roles</a>
+        <a class="nav-item" href="{{ url_for('maintenance.tipos_ticket') }}"><span class="nav-icon">◇</span>Categorías</a>
+        <span class="nav-item" aria-disabled="true"><span class="nav-icon">♧</span>Notificaciones</span>
       </nav>
+      {% endif %}
     </aside>
 
     <main class="main-content">

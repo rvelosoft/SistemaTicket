@@ -5013,3 +5013,600 @@ input[type="checkbox"] {
     }
 
 }
+
+/* Acciones de mantenedores */
+
+.usuarios-row-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.usuarios-row-actions form {
+    margin: 0;
+}
+
+.usuario-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 11px;
+    border: 1px solid rgba(255, 130, 151, .28);
+    border-radius: 6px;
+    background: rgba(255, 130, 151, .1);
+    color: #ff9bad;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: all .2s ease;
+}
+
+.usuario-delete-btn:hover {
+    border-color: #e85f79;
+    background: #8d3348;
+    color: #fff;
+}
+
+/* Formularios de tickets */
+
+.ticket-page {
+    width: min(100%, 1120px);
+    margin: 0 auto;
+    color: var(--text);
+}
+
+.ticket-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.ticket-eyebrow {
+    display: block;
+    margin-bottom: 8px;
+    color: #59d7f2;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.ticket-page-header h2 {
+    margin: 0;
+    color: #f3f6fc;
+    font-size: 25px;
+}
+
+.ticket-page-header p {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.ticket-secondary-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 15px;
+    border: 1px solid #315d83;
+    border-radius: 8px;
+    background: #203d5b;
+    color: #9bd6ff;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.ticket-secondary-action:hover {
+    background: #2c5279;
+    color: #fff;
+}
+
+.ticket-errors {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding: 15px 18px;
+    border: 1px solid #78394e;
+    border-left: 4px solid #ff8297;
+    border-radius: 8px;
+    background: #392332;
+    color: #ffb3c0;
+    font-size: 12px;
+}
+
+.ticket-errors ul {
+    margin: 7px 0 0;
+    padding-left: 18px;
+}
+
+.ticket-message-icon {
+    color: #ff8297;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.ticket-form-card {
+    padding: 22px;
+    border: 1px solid #344155;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #1b2433, #151e2c);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
+}
+
+.ticket-form-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid #344155;
+}
+
+.ticket-form-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #17427b;
+    color: #8dc7ff;
+    font-size: 22px;
+}
+
+.ticket-form-heading h3 {
+    margin: 0 0 4px;
+    color: #f3f6fc;
+    font-size: 15px;
+}
+
+.ticket-form-heading p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.ticket-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 20px;
+}
+
+.ticket-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    min-width: 0;
+}
+
+.ticket-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.ticket-field label {
+    color: #dce5f2;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.ticket-field input,
+.ticket-field select,
+.ticket-field textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    padding: 9px 11px;
+    border: 1px solid #465267;
+    border-radius: 7px;
+    outline: none;
+    background: #151e2c;
+    color: #f3f6fc;
+    font-size: 12px;
+}
+
+.ticket-field textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.ticket-field input[type="date"] {
+    color-scheme: dark;
+}
+
+.ticket-field input:focus,
+.ticket-field select:focus,
+.ticket-field textarea:focus {
+    border-color: #1685ff;
+    box-shadow: 0 0 0 3px rgba(8, 117, 249, .13);
+}
+
+.ticket-field input::placeholder,
+.ticket-field textarea::placeholder {
+    color: #8290a7;
+}
+
+.ticket-field small {
+    color: #8999af;
+    font-size: 10px;
+}
+
+.ticket-field .required {
+    color: #ff8297;
+}
+
+.ticket-field .optional {
+    color: #8999af;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.ticket-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 22px;
+    padding-top: 17px;
+    border-top: 1px solid #344155;
+}
+
+.ticket-required-note {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.ticket-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.ticket-cancel-button,
+.ticket-save-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 39px;
+    padding: 0 15px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ticket-cancel-button {
+    border: 1px solid #526074;
+    background: #202a3a;
+    color: #cbd5e4;
+}
+
+.ticket-save-button {
+    border: 1px solid #0875f9;
+    background: #0875f9;
+    color: #fff;
+}
+
+.ticket-cancel-button:hover {
+    background: #29374c;
+    color: #fff;
+}
+
+.ticket-save-button:hover {
+    background: #1685ff;
+}
+
+/* Carga masiva de tickets */
+
+.carga-masiva-card {
+    overflow: hidden;
+}
+
+.instrucciones-carga {
+    margin: 0 0 18px;
+    padding: 12px 14px;
+    border: 1px solid #315d83;
+    border-left: 4px solid #1685ff;
+    border-radius: 7px;
+    background: #192b40;
+    color: #cbd7e8;
+    font-size: 11px;
+    line-height: 1.65;
+}
+
+.acciones-carga-masiva {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 16px;
+}
+
+.acciones-carga-masiva button,
+.resultado-lote button {
+    min-height: 37px;
+    padding: 0 14px;
+    border: 1px solid #0875f9;
+    border-radius: 7px;
+    background: #0875f9;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.acciones-carga-masiva button:first-child,
+.resultado-lote button {
+    border-color: #526074;
+    background: #202a3a;
+    color: #cbd5e4;
+}
+
+.acciones-carga-masiva button:hover {
+    background: #1685ff;
+}
+
+.acciones-carga-masiva button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+.tabla-carga-masiva-contenedor {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #344155;
+    border-radius: 8px;
+}
+
+.tabla-carga-masiva {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: collapse;
+    background: #192333;
+}
+
+.tabla-carga-masiva th,
+.tabla-carga-masiva td {
+    padding: 9px;
+    border-bottom: 1px solid #344155;
+    color: #dce5f2;
+    font-size: 10px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.tabla-carga-masiva th {
+    background: #222d3e;
+    color: #cbd7e8;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.tabla-carga-masiva tbody tr:nth-child(even) {
+    background: #1b2636;
+}
+
+.tabla-carga-masiva input,
+.tabla-carga-masiva select {
+    width: 100%;
+    min-width: 100px;
+    min-height: 34px;
+    padding: 6px 8px;
+    border: 1px solid #465267;
+    border-radius: 5px;
+    outline: none;
+    background: #151e2c;
+    color: #f3f6fc;
+    font-size: 10px;
+}
+
+.tabla-carga-masiva input:focus,
+.tabla-carga-masiva select:focus {
+    border-color: #1685ff;
+}
+
+.tabla-carga-masiva input[aria-invalid="true"] {
+    border-color: #ff8297;
+}
+
+.numero-fila-carga {
+    color: #8dc7ff !important;
+    font-weight: 700;
+    text-align: center !important;
+}
+
+.resultado-lote {
+    margin: 0 0 16px;
+    padding: 13px 15px;
+    border: 1px solid #465267;
+    border-radius: 8px;
+    background: #202a3a;
+    color: #dce5f2;
+    font-size: 11px;
+}
+
+.resultado-lote p {
+    margin: 0 0 8px;
+}
+
+.resultado-lote ul {
+    margin: 6px 0 12px;
+    padding-left: 20px;
+}
+
+.resultado-lote.exito {
+    border-color: #287b59;
+    background: rgba(100, 231, 162, .08);
+    color: #64e7a2;
+}
+
+.resultado-lote.fallo {
+    border-color: #854454;
+    background: rgba(255, 130, 151, .08);
+    color: #ff8297;
+}
+
+@media (max-width: 700px) {
+    .ticket-page-header,
+    .ticket-form-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ticket-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ticket-field.full-width {
+        grid-column: auto;
+    }
+
+    .ticket-form-actions {
+        width: 100%;
+    }
+
+    .ticket-form-actions a,
+    .ticket-form-actions button {
+        flex: 1;
+    }
+}
+
+/* Índice de mantenedores */
+
+.mantenimiento-index-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+/* Acentos del tablero Kanban por estado */
+/* Grupo Estado Abierto */
+
+.kanban-columna.kanban-abierto {
+    border-color: #315d83;
+    border-top: 3px solid #59aaff;
+    background: linear-gradient(180deg, rgba(32, 61, 91, .3), rgba(21, 30, 44, .96) 150px);
+}
+
+.kanban-abierto .kanban-contador {
+    border-color: #315d83;
+    background: #203d5b;
+    color: #9bd6ff;
+}
+
+.kanban-abierto .kanban-tarjeta {
+    border-color: #31506e;
+    border-left-color: #59aaff;
+    background: linear-gradient(145deg, #203047, #192333);
+}
+
+.kanban-abierto .kanban-tarjeta:hover {
+    border-color: #59aaff;
+}
+
+.kanban-columna.kanban-abierto.arrastre-activo {
+    border-color: #59aaff;
+    background: linear-gradient(180deg, rgba(32, 61, 91, .48), rgba(21, 30, 44, .96) 150px);
+    box-shadow: 0 0 0 2px rgba(89, 170, 255, .16);
+}
+
+
+
+/* -------------------------------------------------- */
+/* Grupo Estado En Progreso */
+
+.kanban-columna.kanban-en-progreso {
+    border-color: #267087;
+    border-top: 3px solid #59d7f2;
+    background: linear-gradient(180deg, rgba(16, 83, 107, .28), rgba(21, 30, 44, .96) 150px);
+}
+
+.kanban-en-progreso .kanban-columna-cabecera {
+    border-bottom-color: #267087;
+}
+
+.kanban-en-progreso .kanban-contador {
+    border-color: #267087;
+    background: #10536b;
+    color: #8ce7f5;
+}
+
+.kanban-en-progreso .kanban-tarjeta {
+    border-color: #285768;
+    border-left-color: #59d7f2;
+    background: linear-gradient(145deg, #1d3039, #19272f);
+}
+
+.kanban-en-progreso .kanban-tarjeta:hover {
+    border-color: #59d7f2;
+}
+
+.kanban-en-progreso .kanban-ticket-id {
+    border-color: #267087;
+    background: #10536b;
+    color: #8ce7f5;
+}
+
+.kanban-columna.kanban-en-progreso.arrastre-activo {
+    border-color: #59d7f2;
+    background: linear-gradient(180deg, rgba(16, 83, 107, .45), rgba(21, 30, 44, .96) 150px);
+    box-shadow: 0 0 0 2px rgba(89, 215, 242, .16);
+}
+
+
+/* -------------------------------------------------- */
+/* Grupo Estado Cerrado */
+
+.kanban-columna.kanban-cerrado {
+    border-color: #287b59;
+    border-top: 3px solid #64e7a2;
+    background: linear-gradient(180deg, rgba(23, 71, 47, .3), rgba(21, 30, 44, .96) 150px);
+}
+
+
+.kanban-cerrado .kanban-columna-cabecera {
+    border-bottom-color: #287b59;
+}
+
+.kanban-cerrado .kanban-contador {
+    border-color: #287b59;
+    background: #17472f;
+    color: #85edb2;
+}
+
+
+.kanban-cerrado .kanban-tarjeta {
+    border-color: #2e6049;
+    border-left-color: #64e7a2;
+    background: linear-gradient(145deg, #20352c, #192923);
+}
+
+
+.kanban-cerrado .kanban-tarjeta:hover {
+    border-color: #64e7a2;
+}
+
+.kanban-cerrado .kanban-ticket-id {
+    border-color: #287b59;
+    background: #17472f;
+    color: #85edb2;
+}
+
+
+.kanban-columna.kanban-cerrado.arrastre-activo {
+    border-color: #64e7a2;
+    background: linear-gradient(180deg, rgba(23, 71, 47, .46), rgba(21, 30, 44, .96) 150px);
+    box-shadow: 0 0 0 2px rgba(100, 231, 162, .16);
+}
+
+.kanban-abierto .kanban-tarjeta.kanban-actualizado,
+.kanban-en-progreso .kanban-tarjeta.kanban-actualizado,
+.kanban-cerrado .kanban-tarjeta.kanban-actualizado {
+    border-color: #64e7a2;
+    box-shadow: 0 0 0 2px rgba(100, 231, 162, .15);
+}

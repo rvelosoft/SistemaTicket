@@ -5,6 +5,13 @@
 Menú Principal | Registro de Actividades
 {% endblock %}
 
+{% block extra_head %}
+    {% if current_user.EsAdministrador %}
+    <meta http-equiv="refresh"
+          content="0;url={{ url_for('tickets.listar_tickets') }}">
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 
 <div class="internal-menu-content">
@@ -17,7 +24,7 @@ Menú Principal | Registro de Actividades
                 PLATAFORMA DE GESTIÓN Y CONTROL
             </span>
 
-            <h2>Menú Principal</h2>
+            <h2></h2>
 
             <p>
                 Selecciona una opción para continuar trabajando.
